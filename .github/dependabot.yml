@@ -1,27 +1,37 @@
-# Weekly update pull requests, grouped so that one week is one review per ecosystem. npm updates arrive as
-# catalog changes in pnpm-workspace.yaml.
+# Weekly update pull requests, labelled with the repository's own `type:chore` rather than labels Dependabot
+# would create. npm updates arrive as catalog changes in pnpm-workspace.yaml.
+#
+# The groups take minor and patch updates only, so one week is one review per ecosystem. A major update
+# arrives as a pull request of its own, because it is a decision (it may need code changes) rather than
+# upkeep, and a group that mixes one in cannot be merged until the major is dealt with.
 version: 2
 updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    labels: ["type:chore"]
     groups:
       actions:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
 
   - package-ecosystem: docker
     directory: /apps/node
     schedule:
       interval: weekly
+    labels: ["type:chore", "app:node"]
 
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    labels: ["type:chore"]
     groups:
       codenhub:
         patterns: ["@codenhub/*"]
+        update-types: ["minor", "patch"]
       toolchain:
         patterns: ["*"]
         exclude-patterns: ["@codenhub/*"]
+        update-types: ["minor", "patch"]
