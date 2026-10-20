@@ -37,4 +37,6 @@ The Workers template is not published: an operator deploys it from a checkout of
 
 ## Dependency updates: `.github/dependabot.yml`
 
-Weekly, grouped by ecosystem: GitHub Actions, the Docker base image, and npm, with the `@codenhub/*` packages in a group of their own because their updates often need code changes here.
+Weekly, grouped by ecosystem: GitHub Actions, the Docker base image, and npm, with the `@codenhub/*` packages in a group of their own because their updates often need code changes here. Dependabot updates the npm catalog in `pnpm-workspace.yaml` and the lockfile together.
+
+The groups take minor and patch updates only. A major update, such as Vitest 4 to 5, arrives as a pull request of its own: it is a decision that may need code changes, and inside a group it would hold the routine updates back until it is dealt with. Every Dependabot pull request is labelled `type:chore`.
