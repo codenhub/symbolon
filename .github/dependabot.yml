@@ -7,7 +7,8 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    # The workflows, and the composite actions under .github/actions/, which `directory: /` alone misses.
+    directories: ["/", "/.github/actions/*"]
     schedule:
       interval: weekly
     labels: ["type:chore"]
