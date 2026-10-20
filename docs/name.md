@@ -25,7 +25,12 @@ An identity provider is a modern symbolon practice:
 
 ## Availability
 
-`symbolon` was free on npm when the project started (2026-10-20). The repository is `codenhub/symbolon` on GitHub and the image is published as `ghcr.io/codenhub/symbolon`. Docker Hub and trademark conflicts were not checked.
+The project holds the name where people will look for it:
+
+- **GitHub:** the repository `codenhub/symbolon`, and the image `ghcr.io/codenhub/symbolon`.
+- **npm:** the package `symbolon`, published as a placeholder (`0.0.0`, no code) on 2026-10-20, and the `symbolon` organization, which owns the `@symbolon` scope. Symbolon does not ship on npm; these exist so that nothing else can publish an "identity provider" under its name. The placeholder's README says so and points to this repository. It may become a real package later, such as an integration helper.
+
+Docker Hub and trademark conflicts were not checked.
 
 ## Sources
 
