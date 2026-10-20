@@ -1,0 +1,10 @@
+{
+  // For the source of packages that must run on every runtime (docs/architecture.md, "Runtime boundary").
+  // No Node.js or Workers types are loaded, so an import of `node:*` or a use of a Workers binding type
+  // fails to type-check instead of slipping into a package that the Workers build also bundles.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "WebWorker"],
+    "types": []
+  }
+}

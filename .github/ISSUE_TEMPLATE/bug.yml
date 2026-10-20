@@ -1,0 +1,44 @@
+name: Bug
+description: Symbolon does not behave the way its documentation says.
+labels: ["type:bug", "status:needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: A security vulnerability is not a bug report. Report it privately, as SECURITY.md describes.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The image tag, or the commit when running from a checkout.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      options:
+        - Docker, SQLite
+        - Docker, PostgreSQL
+        - Cloudflare Workers
+        - Node.js from a checkout
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Remove secrets, tokens, codes and personal data from logs before pasting them.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: The smallest steps that show it, including the relying party or OIDC library involved.

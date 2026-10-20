@@ -1,0 +1,17 @@
+{
+  // The solution: `pnpm typecheck` runs `tsc -b` here, which checks every project below. A new package adds
+  // its tsconfig here.
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/server" },
+    { "path": "./packages/store" },
+    { "path": "./packages/store-d1" },
+    { "path": "./packages/store-postgres" },
+    { "path": "./packages/store-sqlite" },
+    { "path": "./apps/dashboard" },
+    { "path": "./apps/node" },
+    { "path": "./apps/workers" },
+    { "path": "./tests/e2e" }
+  ]
+}

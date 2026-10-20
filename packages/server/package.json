@@ -1,0 +1,21 @@
+{
+  "name": "@symbolon/server",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Symbolon's HTTP surface as one Fetch handler: OIDC endpoints, pages, the admin API, and web hygiene. Runtime-agnostic.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@codenhub/jwt": "catalog:",
+    "@codenhub/oidc": "catalog:",
+    "@symbolon/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@symbolon/store": "workspace:*",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

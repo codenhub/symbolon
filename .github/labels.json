@@ -1,0 +1,16 @@
+[
+  { "name": "type:bug", "color": "d73a4a", "description": "Something does not work as documented" },
+  { "name": "type:feature", "color": "a2eeef", "description": "New functionality or a change to existing behavior" },
+  { "name": "type:security", "color": "b60205", "description": "Hardening, or a fix for a disclosed vulnerability" },
+  { "name": "type:docs", "color": "0075ca", "description": "Documentation only" },
+  { "name": "type:chore", "color": "cfd3d7", "description": "Tooling, CI, dependencies, or repository upkeep" },
+  { "name": "pkg:core", "color": "c5def5", "description": "packages/core" },
+  { "name": "pkg:server", "color": "c5def5", "description": "packages/server" },
+  { "name": "pkg:store", "color": "c5def5", "description": "packages/store and the store adapters" },
+  { "name": "app:node", "color": "bfdadc", "description": "apps/node and the Docker image" },
+  { "name": "app:workers", "color": "bfdadc", "description": "apps/workers and the Workers template" },
+  { "name": "app:dashboard", "color": "bfdadc", "description": "apps/dashboard" },
+  { "name": "upstream", "color": "5319e7", "description": "Needs a change in an @codenhub package first" },
+  { "name": "status:needs-triage", "color": "fbca04", "description": "Not yet reviewed by a maintainer" },
+  { "name": "status:blocked", "color": "b60205", "description": "Waiting on another issue, release, or decision" }
+]

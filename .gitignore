@@ -1,0 +1,37 @@
+# Logs
+logs
+*.log
+pnpm-debug.log*
+
+# Dependencies
+node_modules
+
+# Build output and caches
+dist
+.wrangler
+coverage
+*.tsbuildinfo
+test-results
+playwright-report
+
+# Local data: the SQLite database and anything else a dev instance writes
+/data
+/apps/node/data
+*.db
+*.db-shm
+*.db-wal
+
+# Local environment
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# AI agents
+.agents
+.claude
+.codex
+.cursor
+.gemini
+.opencode
+docs/plans

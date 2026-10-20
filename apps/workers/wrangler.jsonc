@@ -1,0 +1,23 @@
+// The Cloudflare Workers deployment. docs/guides/operator.md walks through it:
+//
+//   pnpm --filter @symbolon/workers exec wrangler d1 create symbolon   # then paste the id below
+//   pnpm --filter @symbolon/workers exec wrangler secret put SYMBOLON_SECRET
+//   pnpm --filter @symbolon/workers run deploy
+//
+// For `pnpm --filter @symbolon/workers run dev`, put the variables in apps/workers/.dev.vars (git-ignored).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "symbolon",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "vars": {
+    "SYMBOLON_ISSUER": "https://id.example.com",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "symbolon",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+    },
+  ],
+}

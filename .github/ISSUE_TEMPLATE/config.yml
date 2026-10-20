@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/codenhub/symbolon/security/advisories/new
+    about: Report it privately instead of opening a public issue. SECURITY.md has the details.
+  - name: A defect in an @codenhub package
+    url: https://github.com/codenhub/codenhub/issues/new/choose
+    about: Defects in @codenhub/oidc, @codenhub/jwt and the other building blocks are tracked in codenhub.

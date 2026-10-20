@@ -1,0 +1,22 @@
+name: Feature
+description: A new capability, or a change to how Symbolon behaves.
+labels: ["type:feature", "status:needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you are trying to do, and what stops you today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+    validations:
+      required: true
+  - type: textarea
+    id: invariants
+    attributes:
+      label: Invariants touched
+      description: Which of the invariants in docs/specs/invariants.md the proposal affects, if any, and how it keeps them.

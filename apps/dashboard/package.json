@@ -1,0 +1,19 @@
+{
+  "name": "@symbolon/dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The admin and account dashboard: a single-page app on the admin API, built with the @codenhub UI packages.",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codenhub/icons": "catalog:",
+    "@codenhub/styles": "catalog:"
+  },
+  "devDependencies": {
+    "vite": "catalog:"
+  }
+}

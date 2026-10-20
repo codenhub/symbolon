@@ -1,0 +1,182 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A pull request pushed to again abandons the run it superseded; `main` keeps every run, because each merge
+# is the authoritative check of a commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  # Invariant 11 holds for the toolchain too: wrangler reports usage unless told not to.
+  WRANGLER_SEND_METRICS: "false"
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The PostgreSQL adapter's conformance tests skip without a server; here they always run.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      SYMBOLON_TEST_POSTGRES_URL: postgres://postgres:postgres@localhost:5432/postgres
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      # Format, lint, typecheck, unit and integration tests (SQLite, D1 in workerd, PostgreSQL, the Worker in
+      # workerd), and every build.
+      - name: Verify
+        run: pnpm verify
+
+  # The browser suites run in Playwright's own image, which carries the browsers and system libraries of one
+  # Playwright version; installing them on a bare runner downloads them on every run. The image follows the
+  # version the lockfile pins, so a Playwright upgrade moves CI with it. A container's image is fixed before
+  # its steps run, so the version is read in a job of its own.
+  playwright:
+    name: Playwright image
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+    steps:
+      - name: Check out the lockfile
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          sparse-checkout: pnpm-lock.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Resolve the image
+        id: image
+        run: |
+          versions="$(grep -oE "^  playwright-core@[^:]+" pnpm-lock.yaml | sed "s/^  playwright-core@//" | sort -u)"
+          if [ "$(printf '%s\n' "$versions" | grep -c .)" -ne 1 ]; then
+            echo "::error::Expected one playwright-core version in pnpm-lock.yaml, found: ${versions:-none}"
+            exit 1
+          fi
+          echo "image=mcr.microsoft.com/playwright:v${versions}-noble" >> "$GITHUB_OUTPUT"
+
+  e2e:
+    # One engine per job: cookie and redirect behavior is where engines differ most, and an identity provider
+    # is made of both. `fail-fast` is off because "Firefox broke" and "WebKit broke" are different findings.
+    name: End-to-end (${{ matrix.engine }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: playwright
+    # The runner's own user, as Playwright's CI guide recommends: Firefox refuses to start as root in a home
+    # another user owns.
+    container:
+      image: ${{ needs.playwright.outputs.image }}
+      options: --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      - name: Run the browser suites
+        run: pnpm --filter @symbolon/e2e exec playwright test --project=${{ matrix.engine }}
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: playwright-${{ matrix.engine }}
+          path: |
+            tests/e2e/test-results/**
+            tests/e2e/playwright-report/**
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # The single check a branch rule can require: a matrix reports one check per engine, so a rule naming
+  # "End-to-end" would wait forever. `always()` makes it fail when an engine failed, rather than be skipped,
+  # since a skipped required check blocks a pull request without saying why.
+  e2e-result:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: e2e
+    if: always()
+    steps:
+      - name: Report the engine jobs
+        run: |
+          echo "Engine jobs finished with: ${{ needs.e2e.result }}"
+          test "${{ needs.e2e.result }}" = "success"
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      # One architecture here, loaded into the runner's Docker; the release builds every architecture.
+      - name: Build the image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: apps/node/Dockerfile
+          load: true
+          tags: symbolon:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # The image must run as a non-root user, become healthy on its own health check, answer on its volume,
+      # and refuse a plain-HTTP issuer outside dev mode.
+      - name: Smoke-test the image
+        run: |
+          set -eu
+          user="$(docker image inspect symbolon:ci --format '{{.Config.User}}')"
+          if [ -z "$user" ] || [ "$user" = "root" ] || [ "$user" = "0" ]; then
+            echo "::error::The image runs as root."
+            exit 1
+          fi
+
+          if docker run --rm -e SYMBOLON_ISSUER=http://id.example.com -e SYMBOLON_SECRET="$(openssl rand -base64 32)" symbolon:ci; then
+            echo "::error::The image started with a plain-HTTP issuer outside dev mode."
+            exit 1
+          fi
+
+          docker run -d --name symbolon -p 3000:3000 \
+            -e SYMBOLON_ISSUER=https://id.example.com \
+            -e SYMBOLON_SECRET="$(openssl rand -base64 32)" \
+            -v symbolon-data:/data symbolon:ci
+          for _ in $(seq 1 30); do
+            status="$(docker inspect symbolon --format '{{.State.Health.Status}}')"
+            [ "$status" = "healthy" ] && break
+            sleep 2
+          done
+          docker logs symbolon
+          test "$status" = "healthy"
+          curl --fail --silent --show-error http://127.0.0.1:3000/healthz
+          docker exec symbolon test -f /data/symbolon.db

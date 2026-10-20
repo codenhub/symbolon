@@ -1,0 +1,8 @@
+{
+  // For Node.js code: the Node.js adapters, and the tests of every package, which run under Vitest on Node.js.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM"],
+    "types": ["node"]
+  }
+}

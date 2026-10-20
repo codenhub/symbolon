@@ -1,0 +1,27 @@
+# Weekly update pull requests, grouped so that one week is one review per ecosystem. npm updates arrive as
+# catalog changes in pnpm-workspace.yaml.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /apps/node
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      codenhub:
+        patterns: ["@codenhub/*"]
+      toolchain:
+        patterns: ["*"]
+        exclude-patterns: ["@codenhub/*"]

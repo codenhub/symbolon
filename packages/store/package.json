@@ -1,0 +1,19 @@
+{
+  "name": "@symbolon/store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The schema migrations every store adapter applies, a memory store, and the store conformance suite. Runtime-agnostic.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "dependencies": {
+    "@symbolon/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

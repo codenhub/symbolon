@@ -1,0 +1,9 @@
+# Prettier governs Markdown only in this repository; oxfmt owns every other
+# format. The root scripts always hand Prettier `**/*.md`, so this file only
+# carves out paths within that set.
+**/node_modules/
+**/dist/
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/.wrangler/

@@ -1,0 +1,23 @@
+{
+  "name": "@symbolon/node",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Node.js runtime: the HTTP server, the store chosen by configuration, and the Docker image.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --dev",
+    "start": "node --enable-source-maps --env-file-if-exists=.env dist/main.js"
+  },
+  "dependencies": {
+    "@symbolon/core": "workspace:*",
+    "@symbolon/server": "workspace:*",
+    "@symbolon/store-postgres": "workspace:*",
+    "@symbolon/store-sqlite": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "esbuild": "catalog:",
+    "vitest": "catalog:"
+  }
+}

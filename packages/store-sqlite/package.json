@@ -1,0 +1,19 @@
+{
+  "name": "@symbolon/store-sqlite",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The SQLite store adapter, on Node.js's built-in node:sqlite. The Docker image's default store.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@symbolon/core": "workspace:*",
+    "@symbolon/store": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

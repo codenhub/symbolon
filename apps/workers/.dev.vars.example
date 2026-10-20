@@ -1,0 +1,5 @@
+# Copy to apps/workers/.dev.vars for `wrangler dev`. The .dev.vars file is git-ignored.
+SYMBOLON_ISSUER=http://localhost:8787
+# Generate one: node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
+SYMBOLON_SECRET=
+SYMBOLON_DEV_MODE=true

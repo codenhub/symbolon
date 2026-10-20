@@ -1,0 +1,37 @@
+{
+  "name": "symbolon",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A self-hosted, free and open-source OpenID Connect identity provider.",
+  "license": "Apache-2.0",
+  "author": "coden.agency",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "dev": "pnpm --filter @symbolon/node run dev",
+    "format:check": "oxfmt --check && prettier --check --log-level warn \"**/*.md\"",
+    "format:fix": "oxfmt && prettier --write --log-level warn \"**/*.md\"",
+    "lint:check": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "prepare": "node .githooks/install.mjs",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm --filter @symbolon/e2e run test:e2e",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b",
+    "verify": "pnpm format:check && pnpm lint:check && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.14.1 <25",
+    "pnpm": ">=11.7.0"
+  },
+  "packageManager": "pnpm@11.7.0"
+}

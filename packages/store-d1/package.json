@@ -1,0 +1,20 @@
+{
+  "name": "@symbolon/store-d1",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Cloudflare D1 store adapter, for the Workers runtime.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@symbolon/core": "workspace:*",
+    "@symbolon/store": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "miniflare": "catalog:",
+    "vitest": "catalog:"
+  }
+}
