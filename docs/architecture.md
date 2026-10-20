@@ -1,12 +1,12 @@
 ---
-status: DRAFT
+status: IMPLEMENTED
 last_updated: 2026-10-20
 scope: Workspace layout, dependency direction, the runtime boundary, and the structural decisions behind them.
 ---
 
 # Architecture
 
-This document records how the repository is put together and why. It was written with the initial scaffold and is DRAFT until a maintainer approves it; [the scope](scope.md) is where the product requirements live.
+This document records how the repository is put together and why; [the scope](scope.md) is where the product requirements live. The code follows it. Two decisions in it are provisional and say so, the HTTP framework and the dashboard, and are settled when the code that needs them is written.
 
 ## Layout
 
