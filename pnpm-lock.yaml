@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@codenhub/icons':
-      specifier: ^0.2.1
-      version: 0.2.1
+      specifier: ^0.3.0
+      version: 0.3.0
     '@codenhub/jwt':
       specifier: ^0.0.1
       version: 0.0.1
@@ -88,7 +88,7 @@ importers:
     dependencies:
       '@codenhub/icons':
         specifier: 'catalog:'
-        version: 0.2.1(postcss@8.5.31)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2))
+        version: 0.3.0(postcss@8.5.31)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2))
       '@codenhub/styles':
         specifier: 'catalog:'
         version: 0.6.0
@@ -357,9 +357,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@codenhub/icons@0.2.1':
-    resolution: {integrity: sha512-x5E/D+ddlL+ZxyTwz/d2ZBKhUxOMY8433/3qb/+64+qeelAYx4Jz/aSYpTImQ8i35aiQ+JndbLWtekaXY/pa1Q==}
-    engines: {node: '>=22'}
+  '@codenhub/icons@0.3.0':
+    resolution: {integrity: sha512-gdgXxoJcjqS4AOSokoPd+bEihM7arQfwONiQ4kqC5vFLrmTtnHQIEtFYIb/ynMBIpYVHJ823maqG5E8EnSxqcQ==}
+    engines: {node: '>=24'}
     peerDependencies:
       postcss: '>=8.0.0'
       tailwindcss: '>=4.0.0'
@@ -1735,7 +1735,7 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20261019.1':
     optional: true
 
-  '@codenhub/icons@0.2.1(postcss@8.5.31)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2))':
+  '@codenhub/icons@0.3.0(postcss@8.5.31)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2))':
     optionalDependencies:
       postcss: 8.5.31
       vite: 8.3.4(@types/node@26.6.5)(esbuild@0.28.2)
