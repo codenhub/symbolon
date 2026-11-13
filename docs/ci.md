@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-10-20
+last_updated: 2026-11-12
 scope: The pinned toolchain, the CI jobs, releases, and dependency updates.
 ---
 
