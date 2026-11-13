@@ -132,9 +132,7 @@ When a new document could fit more than one place, file it by its main job: rule
 
 A roadmap, when the project keeps one, records durable direction: current focus, what is planned, what may come, and what was ruled out and why. It is not a task list or a replacement for issue tracking. Entries describe outcomes, not steps, and carry dates only for a real commitment or external constraint.
 
-Plans and other short-lived notes go in `docs/plans/`, which is git-ignored and stays that way.
-
-Every document is listed in [`docs/README.md`](../README.md). Adding, moving, or deleting one updates that index in the same change.
+Every tracked, durable document is listed in [`docs/README.md`](../README.md). Adding, moving, or deleting one updates that index in the same change.
 
 ## Agent instructions
 
@@ -173,4 +171,4 @@ A guide, a README, or any page meant to teach what the project ships to someone 
 - **Order by need, not by module.** Put first what a newcomer needs first, then what they reach for next. Source layout is the wrong order more often than not.
 - **Carry a running example.** One small, realistic scenario that grows across pages connects them and shows how features combine. Add something on each page instead of starting over.
 - **Common case first, edge cases after.** Start with the smallest example that works, then realistic use, then limits, failures, and workarounds. A reader who stops early has still learned something correct.
-- **Hand off at the end.** Each page ends by saying where to go next and why.
+- **Hand off at the end.** Each page with a natural next page ends by saying where to go next and why; the last page of a sequence has none.

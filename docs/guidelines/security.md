@@ -29,7 +29,7 @@ scope: How the invariants turn into code, for anyone writing or reviewing a chan
 ## Input
 
 - Every request input (body, query, headers, cookies) is validated with `@codenhub/validation` at the boundary, in `server`, before any other code sees it, and parsed into a typed value. What does not parse is rejected, not passed along.
-- Every input has a size bound: the body is read with a byte limit before parsing, and every string and collection in a schema has a `max`. The read itself enforces the limit: when the body reaches it, the read stops and the request is rejected, never truncated and parsed as if it were whole. A `Content-Length` check before the read can reject early, but it is not the bound.
+- Every input has a size bound: the body is read with a byte limit before parsing, and every string and collection in a schema has a `max`. The read itself enforces the limit: it stops as soon as the body is seen to exceed the limit and the request is rejected, so a body of exactly the limit is accepted and one over it is never truncated and parsed as if it were whole. A `Content-Length` check before the read can reject early, but it is not the bound.
 - URLs are built on the configured issuer, never on the `Host` header or `X-Forwarded-*` headers, which the client controls.
 - Redirect targets are only ever registered redirect URIs, compared exactly.
 - Do not build a query, command, or HTML by concatenating input. Use parameters, argument arrays, and escaping by default.

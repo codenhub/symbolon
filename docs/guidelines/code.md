@@ -73,7 +73,7 @@ Exceptions: framework callbacks, test helpers, tiny local functions, and APIs wh
 
 Most review findings that hold up are about these, not about style: a [study of the review threads in codenhub/codenhub](https://github.com/codenhub/codenhub/blob/37b44e7adc31f628c94fb9ff8bd257c869f64996/packages/skills/docs/internal/coding-skill-research.md), a monorepo whose code agents wrote, records the evidence.
 
-- Validate input from outside the code's control after it is converted, against the limits of what consumes it: `--timeout 1e308` passes "positive number" and becomes an infinite timer. Reject empty, whitespace-only, NaN, Infinity, and partial numbers such as `10s`.
+- Validate input from outside the code's control after it is converted, against the limits of what consumes it: `--timeout 1e308` passes "positive number" and then overflows the timer, which Node.js clamps to a delay of 1 ms. Reject empty, whitespace-only, NaN, Infinity, and partial numbers such as `10s`.
 - When required input is missing or matches nothing, fail with a message naming it. A run whose required input was absent never reports success.
 - Hold unsaved changes in memory freely; that needs no write. Mark them as saved, such as a record's saved status or a cache entry's committed flag, only after the write succeeds, and never swallow a write error. A record shown as saved whose write failed is lost the next time the process restarts, and nobody was told.
 - Apply a new option or fix to every path the same input or behavior flows through: each source of the value, sync and async variants, create and update, and every caller. Name any path left out, with the reason.
