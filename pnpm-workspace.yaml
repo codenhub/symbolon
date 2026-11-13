@@ -6,12 +6,12 @@ packages:
 # Every version is declared once, here, and packages refer to it as `catalog:`,
 # so the workspace can never hold two versions of one dependency by accident.
 catalog:
-  "@codenhub/i18n": ^0.1.0
-  "@codenhub/icons": ^0.2.1
+  "@codenhub/i18n": ^0.2.1
+  "@codenhub/icons": ^0.3.0
   "@codenhub/jwt": ^0.0.1
   "@codenhub/oidc": ^0.0.1
-  "@codenhub/styles": ^0.6.0
-  "@codenhub/validation": ^0.4.0
+  "@codenhub/styles": ^0.7.0
+  "@codenhub/validation": ^0.5.1
   "@playwright/test": ^1.61.1
   "@types/node": ^24.19.2
   "@vitest/coverage-v8": ^5.0.5
