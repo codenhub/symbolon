@@ -13,6 +13,8 @@ nvm install
 pnpm install
 ```
 
+nvm for Windows does not read `.nvmrc`, and `nvm install` without a version fails there. In PowerShell, run `nvm install (Get-Content .nvmrc)` and `nvm use (Get-Content .nvmrc)` in place of `nvm install`.
+
 Setup also points git at `.githooks/` through `core.hooksPath`, so the hooks described below start working after it and not before. [Tooling](docs/tooling.md#setup) says where each version is pinned, what happens outside it, and how to point git at the hooks by hand. [Local development](docs/tooling.md#local-development) shows how to start the server for development.
 
 ## Changes
@@ -32,7 +34,7 @@ Each issue carries one label from each group that applies:
 | Group     | Labels                                        | Says                                                        |
 | --------- | --------------------------------------------- | ----------------------------------------------------------- |
 | `type:`   | `bug`, `feature`, `security`, `docs`, `chore` | What kind of work it is                                     |
-| `pkg:`    | one per library member, by its commit scope   | Which package it is in                                      |
+| `pkg:`    | `core`, `server`, `store`                     | Which package it is in; `store` also covers the adapters    |
 | `app:`    | one per application member, by commit scope   | Which app it is in                                          |
 | `status:` | `needs-triage`, `blocked`                     | Why it is not moving, when it is not                        |
 | —         | `upstream`                                    | The issue waits on a change in an `@codenhub` package first |
@@ -128,11 +130,11 @@ Symbolon's members are `core`, `server`, `store`, `store-sqlite`, `store-postgre
 
 ### Subject
 
-Imperative mood, lowercase, no trailing period: "add", not "added" or "Adds". Aim for 50 characters and stay under 72, which the hook enforces.
+Imperative mood, lowercase, no trailing period: "add", not "added" or "Adds". Aim for 50 characters and stay at 72 or fewer, which the hook enforces.
 
 Describe what the change does for someone reading the log later, not which files moved. `fix(server): build request urls on the issuer, not the host header` says what broke and what now happens; `fix(server): update serve.ts` says nothing a diff would not.
 
-Append `!` after the scope for a change that breaks a contract someone relies on, such as a public API, a configuration variable, or a persisted format, and say in the body what breaks and what to do about it. For Symbolon that is a change an operator must act on when upgrading, such as a renamed variable or an incompatible migration.
+Append `!` right before the colon, after the scope when there is one (`feat(server)!:`) or directly after the type (`feat!:`), for a change that breaks a contract someone relies on, such as a public API, a configuration variable, or a persisted format, and say in the body what breaks and what to do about it. For Symbolon that is a change an operator must act on when upgrading, such as a renamed variable or an incompatible migration.
 
 ### Body
 
@@ -166,7 +168,7 @@ Run scripts from the repository root. During development, narrow checks to what 
 pnpm verify
 ```
 
-It runs the same checks CI runs, except those CI adds: the PostgreSQL tests, the browser suites, and the Docker image ([CI](docs/ci.md#pull-requests-and-main-githubworkflowsciyml)). Run `pnpm test:e2e` too when the change affects anything a browser sees. Report any step that was skipped or failed.
+It runs the same checks CI runs, except those CI adds: the PostgreSQL tests, the browser suites, the Docker image, and a check that the run left the working tree clean ([CI](docs/ci.md#pull-requests-and-main-githubworkflowsciyml)). Run `pnpm test:e2e` too when the change affects anything a browser sees. Report any step that was skipped or failed.
 
 ## Pull requests
 

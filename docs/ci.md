@@ -12,7 +12,7 @@ scope: The CI workflow, the shared setup action, action pinning, releases, depen
 
 Local and CI runs resolve the same versions, each declared once, and CI reads those same declarations rather than repeating a version. A version is raised in one place, and a machine that cannot satisfy it is told at install time instead of failing later in a way nobody can reproduce. [Workspace](workspace.md#toolchain) lists where each version is declared.
 
-Setup, the toolchain and an install from the lockfile, lives in the composite action `.github/actions/setup`, so every job that needs the project sets it up the same way. A lockfile that disagrees with the manifests fails the install rather than being rewritten in CI.
+The composite action `.github/actions/setup` sets up the toolchain and installs from the lockfile, so every job that needs the project sets it up the same way. A lockfile that disagrees with the manifests fails the install rather than being rewritten in CI.
 
 ## Pull requests and `main`: `.github/workflows/ci.yml`
 
@@ -71,7 +71,7 @@ The Workers template is not published: an operator deploys it from a checkout of
 
 `.github/dependabot.yml` proposes weekly updates for the GitHub Actions, including the composite actions under `.github/actions/`, the Docker base image, and the npm dependencies, with the `@codenhub/*` packages in a group of their own because their updates often need code changes here. It moves an action's SHA and its version comment together, so a pin and its label cannot drift apart. npm updates arrive as catalog changes in `pnpm-workspace.yaml`, with the lockfile, as [Workspace](workspace.md#versions) describes. Every update pull request is labelled `type:chore`.
 
-The groups take minor and patch updates only, so a week is one grouped pull request per ecosystem and directory. Dependabot groups each listed directory on its own, so the workflows and `.github/actions/*` can each get one: two pull requests for the actions in one week is the configuration working, not a duplicate. A major update, such as Vitest 4 to 5, arrives as a pull request of its own: it is a decision that may need code changes, and inside a group it would hold the routine updates back until it is dealt with.
+The groups take minor and patch updates only, so a week brings at most one pull request per group: `codenhub` and `toolchain` for npm, and `actions` for each listed directory, since Dependabot groups each directory on its own. Two pull requests for the actions in one week, or two for npm, is the configuration working, not a duplicate; the Docker base image has no group and gets a pull request per update. A major update, such as Vitest 4 to 5, arrives as a pull request of its own: it is a decision that may need code changes, and inside a group it would hold the routine updates back until it is dealt with.
 
 A dependency held back for a known breakage gets an `ignore` entry with the reason and the condition for removing it.
 

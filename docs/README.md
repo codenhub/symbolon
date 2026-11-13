@@ -8,7 +8,7 @@ scope: Index of the project documentation.
 
 `docs/` holds durable project knowledge. [Contributing](../CONTRIBUTING.md) contains the contributor workflow, and [agent instructions](../AGENTS.md) contain how agents work here. The [documentation guidelines](guidelines/documentation.md) define how these documents are written, what their status means, and how they change.
 
-Every document in `docs/` is listed here. Adding, moving, or deleting one updates this index in the same change.
+Every other document in `docs/` is listed here. Adding, moving, or deleting one updates this index in the same change.
 
 ## Overview
 
