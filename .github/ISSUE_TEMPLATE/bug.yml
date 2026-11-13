@@ -46,4 +46,4 @@ body:
     id: workaround
     attributes:
       label: Workaround in place
-      description: What you did to keep going, and where, so it can be removed once this is fixed.
+      description: What you did to keep going, and where, so it can be removed once this is fixed. Remove secrets, tokens, codes and personal data first.
