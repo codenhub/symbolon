@@ -10,7 +10,7 @@ The [coding guidelines](code.md) hold for every language in the project. This do
 
 ## Naming
 
-- Files and folders: kebab-case (`create-handler.ts`, `store-d1/`). oxlint enforces it.
+- Files and folders: kebab-case (`create-handler.ts`, `store-d1/`). oxlint enforces it for file names; review keeps folder names.
 - Variables and functions: camelCase (`loadConfig`, `isDevMode`).
 - Classes and types: PascalCase (`ConfigError`, `SettingsStore`).
 - Constants: UPPER_SNAKE_CASE (`MIGRATIONS_TABLE`).
@@ -39,7 +39,7 @@ The [coding guidelines](code.md) hold for every language in the project. This do
 
 - Use `async`/`await` for asynchronous code.
 - Run independent async work in parallel with `Promise.all()`. Sequential awaits in a loop need a reason, given in the comment on the `oxlint-disable-next-line` suppression they require, as the migrations have.
-- `console` is for entrypoints reporting startup failures, build scripts, tests, and deliberate diagnostics; oxlint forbids it elsewhere. Casual logging is not a substitute for error handling, and the [security guidelines](security.md) say what may reach a log.
+- `console` is for entrypoints reporting startup failures, build scripts, git hooks, and tests: the paths `.oxlintrc.json` exempts from `no-console`. oxlint forbids it elsewhere, and a deliberate diagnostic there needs a scoped lint override with its reason. Casual logging is not a substitute for error handling, and the [security guidelines](security.md) say what may reach a log.
 
 ## TSDoc
 

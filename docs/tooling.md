@@ -32,7 +32,7 @@ Setup needs pnpm on the `PATH`, installed apart from Node.js, with the standalon
 | `pnpm dev`           | The Node.js server, rebuilt and restarted on every change (`pnpm --filter @symbolon/node run dev`). Reads `apps/node/.env`.                |
 | `pnpm format:check`  | `oxfmt --check`, then `prettier --check` over `**/*.md`.                                                                                   |
 | `pnpm format:fix`    | The same two formatters, rewriting files.                                                                                                  |
-| `pnpm lint:check`    | `oxlint`.                                                                                                                                  |
+| `pnpm lint:check`    | `oxlint --deny-warnings`: a warning fails it, like an error.                                                                               |
 | `pnpm lint:fix`      | `oxlint --fix`.                                                                                                                            |
 | `pnpm typecheck`     | `tsc -b` over the solution in `tsconfig.json`: every package, app and suite it references.                                                 |
 | `pnpm test`          | `vitest run`: every package's and app's Vitest project, in one run. No browser.                                                            |

@@ -11,7 +11,7 @@ This document defines how Symbolon is tested: what kinds of tests exist, where t
 ## Principles
 
 - **Test behavior, not implementation.** A test verifies what a caller can observe, not how the code produces it.
-- **Fast and deterministic.** A flaky test is a bug. Time, randomness, and the network come from sources a test controls (for time and randomness, the ports); a test that depends on real timing, the network, or a real window does not belong in the default suite.
+- **Fast and deterministic.** A flaky test is a bug. Time and randomness come from ports a test controls, and a test that depends on real timing or a real window does not belong in the default suite. The default suite reaches the network only on loopback (the `node:http` tests) and, when `SYMBOLON_TEST_POSTGRES_URL` is set, the PostgreSQL server that variable names.
 - **Error paths count.** Failure cases are tested as carefully as the happy path, and inputs and edge cases early. Every error path an attacker can reach counts most: for an identity provider the failure cases are the product.
 - **Every invariant has a test,** named in the invariant's "Enforced by" line ([invariants](invariants.md)).
 - **No permanent absence checks.** A test asserting only that a removed name, class, or token is gone, such as an assertion that some output does not contain `old-name`, verifies nothing about current behavior: it is indistinguishable from asserting the absence of a string that never existed. Such a check earns its place only while a rename or removal is in flight, as a guard against a forgotten reference; delete it once the change is verified, in the same pull request. A durable rule, such as "no compatibility aliases", is a lint rule or repository check, not a permanent unit test.
@@ -23,11 +23,11 @@ This document defines how Symbolon is tested: what kinds of tests exist, where t
 | Unit        | Next to the code it tests           | With the default suite                   | One module, its dependencies replaced by the memory store or a fake port.   |
 | Integration | In the package or app it belongs to | With the default suite                   | A real boundary: a database, `node:http`, workerd.                          |
 | Conformance | Each adapter's integration tests    | With the default suite                   | Every store adapter against the shared suites. See below.                   |
-| Security    | `packages/server/tests/security/`   | With the default suite                   | The hostile-input suite. See below.                                         |
+| Security    | `packages/server/tests/security/`   | Planned; no tests exist yet              | The hostile-input suite. See below.                                         |
 | Browser     | `tests/e2e`, a workspace package    | Apart from the default suite, on its own | Full user journeys in Chromium, Firefox and WebKit, against a built server. |
 | OpenID      | Not in the repository               | By hand, against a deployed instance     | The OpenID conformance suite's Basic OP and Config OP plans.                |
 
-The default suite is what the gate's test step runs. Add a category only when the project has tests for it: an empty suite, or a script that passes without running anything, misleads more than a missing one.
+The default suite is what the gate's test step runs. Add a category only when the project has tests for it, and mark one that is only planned as such, as the security suite is: an empty suite, or a script that passes without running anything, misleads more than a missing one.
 
 Manual usage scenarios, such as a playground used during development, are outside these categories.
 
@@ -72,7 +72,7 @@ The Workers build is tested in workerd, not only on Node.js: `apps/workers/tests
 
 ## Security suite
 
-In the spirit of the codenhub packages' hostile-input suites, `packages/server/tests/security/` holds one file per concern, each added with the feature it guards:
+Planned: `packages/server/tests/security/` does not exist yet, and `pnpm test` runs nothing from it. In the spirit of the codenhub packages' hostile-input suites, it will hold one file per concern, each added with the feature it guards:
 
 - setup without the token, or with a wrong one
 - user enumeration: same responses and comparable timing for existing and missing accounts
