@@ -2,9 +2,9 @@
 # Refuses a push that would write to `main`, or to a branch whose name is not
 # `<type>/<slug>`.
 #
-# `main` is verified in full by CI and deployed from, so a commit that arrives
-# there without a pull request is one nobody reviewed and one that publishes
-# itself. The rule is in CONTRIBUTING.md; this is what makes it more than advice.
+# `main` is the branch CI verifies in full, so a commit that arrives there
+# without a pull request is one nobody reviewed. The rule is in CONTRIBUTING.md;
+# this is what makes it more than advice.
 #
 # The branch name is checked here because a tool often picks it before anyone
 # has read the rule: `claude/...` and `codex/...` are names nobody chose.
