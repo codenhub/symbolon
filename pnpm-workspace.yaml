@@ -13,7 +13,7 @@ catalog:
   "@codenhub/styles": ^0.6.0
   "@codenhub/validation": ^0.4.0
   "@playwright/test": ^1.61.1
-  "@types/node": ^26.1.0
+  "@types/node": ^24.19.2
   "@vitest/coverage-v8": ^5.0.5
   esbuild: ^0.28.1
   miniflare: ^5.20261012.1-beta
@@ -31,3 +31,8 @@ trustPolicy: no-downgrade
 allowBuilds:
   esbuild: true
   workerd: true
+
+# Makes pnpm refuse an install outside `engines` in package.json instead of only printing a warning, so a
+# mismatch surfaces before it turns into a failure no one can reproduce. It lives here because pnpm ignores
+# `engine-strict` in .npmrc: checked with pnpm 11.7.
+engineStrict: true

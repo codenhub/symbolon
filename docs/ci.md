@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-10-20
+last_updated: 2026-11-12
 scope: The pinned toolchain, the CI jobs, releases, and dependency updates.
 ---
 
@@ -8,7 +8,7 @@ scope: The pinned toolchain, the CI jobs, releases, and dependency updates.
 
 ## Pinned toolchain
 
-A local run and a CI run resolve the same versions. `engines` in `package.json` declares the range, `.nvmrc` names the exact Node.js, `packageManager` names the exact pnpm, and `.npmrc` sets `engine-strict` so an install outside the range fails rather than warns. `.github/actions/setup` reads `.nvmrc` and `packageManager`, so CI has no versions of its own to keep in step.
+A local run and a CI run resolve the same versions. `engines` in `package.json` declares the range, `.nvmrc` names the exact Node.js, `packageManager` names the exact pnpm, and `engineStrict` in `pnpm-workspace.yaml` makes an install outside the range fail rather than warn. It is not in `.npmrc`, because pnpm 11.7 ignores `engine-strict` there and only warns. `.github/actions/setup` reads `.nvmrc` and `packageManager`, so CI has no versions of its own to keep in step.
 
 Every third-party action is pinned to a commit SHA, with its version in a comment. A tag can be moved to other code; a SHA cannot. Dependabot proposes the updates.
 

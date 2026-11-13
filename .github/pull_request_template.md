@@ -15,3 +15,4 @@ Fixes #
 - [ ] No secret, token or code can reach a log, an error, an audit entry or a response (invariant 2)
 - [ ] New request input is validated at the boundary, with a bounded size (invariant 4)
 - [ ] Each invariant the change touches has a test, and its "Enforced by" line in `docs/specs/invariants.md` is updated
+- [ ] A new dependency, permission, or externally reachable surface is named in the description
