@@ -1,9 +1,10 @@
 #!/bin/sh
 # Formats and lints what is about to be committed.
 #
-# Only the two mechanical checks run here. Type checking and tests belong to
-# `pnpm verify`: they take minutes, and a hook that slow gets bypassed until it
-# may as well not exist.
+# Only the mechanical checks run here, the ones `.githooks/profile.sh` declares
+# for the project's stack. Type checking and tests belong to the delivery gate:
+# they take minutes, and a hook that slow gets bypassed until it may as well not
+# exist.
 #
 # Files are read from the working tree rather than from the index, which matters
 # for a file that is only partly staged. Such a file is never rewritten, because
@@ -23,57 +24,68 @@ trap "" PIPE
 
 cd "$(git rev-parse --show-toplevel)"
 
+# The profile replaces this with the commands that fix what its checks report.
+PROFILE_FIX_HINT='Fix what is reported'
+
 work=$(mktemp -d)
 report() {
   status=$?
   if [ "$status" -ne 0 ]; then
-    printf '\npre-commit failed. Run `pnpm format:fix` and `pnpm lint:fix`, or commit with --no-verify.\n' >&2
+    printf '\npre-commit failed. %s, or commit with --no-verify.\n' "$PROFILE_FIX_HINT" >&2
   fi
   rm -rf "$work"
   exit "$status"
 }
 trap report EXIT
 
-git diff --cached --name-only --diff-filter=ACMR |
-  grep -E '\.(astro|cjs|css|cts|html|js|json|jsx|md|mjs|mts|svelte|ts|tsx)$' >"$work/staged" || true
+# Runs a command over a newline-delimited file list, skipping an empty one.
+run_on() {
+  run_list=$1
+  shift
+  if [ -s "$run_list" ]; then
+    tr '\n' '\0' <"$run_list" | xargs -0 "$@"
+  fi
+}
+
+# Runs a command over the files in a list whose extension matches a `grep -E`
+# alternation, such as `md` or `ts|tsx`, skipping the command when none does.
+on_ext() {
+  ext_list=$1
+  ext=$2
+  shift 2
+  grep -E "\.($ext)\$" "$ext_list" >"$work/on_ext" || true
+  run_on "$work/on_ext" "$@"
+}
+
+# The stack's checks. The profile sets PROFILE_EXTENSIONS, the extensions any of
+# them reads, as a `grep -E` alternation, and PROFILE_FIX_HINT; and it defines
+# profile_fix, which rewrites, and profile_check, which checks, the
+# newline-delimited file list in "$1", typically through on_ext.
+# Without one there is nothing to run, as in the template repository, whose
+# profiles are checked by its own workflow instead.
+if [ ! -f .githooks/profile.sh ]; then
+  printf 'pre-commit: no .githooks/profile.sh, so no stack checks ran.\n' >&2
+  exit 0
+fi
+. ./.githooks/profile.sh
+
+# `core.quotePath=false` lists a path with non-ASCII characters as it is. Quoted, as
+# `"caf\303\251.md"`, it would match no extension below and go unchecked.
+git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR |
+  grep -E "\.($PROFILE_EXTENSIONS)\$" >"$work/staged" || true
 
 if [ ! -s "$work/staged" ]; then
   exit 0
 fi
 
-git diff --name-only >"$work/unstaged" || true
+git -c core.quotePath=false diff --name-only >"$work/unstaged" || true
 grep -Fxv -f "$work/unstaged" "$work/staged" >"$work/fixable" || true
 
-# Runs a command over a newline-delimited file list, skipping an empty one.
-run_on() {
-  list=$1
-  shift
-  if [ -s "$list" ]; then
-    tr '\n' '\0' <"$list" | xargs -0 "$@"
-  fi
-}
-
-# oxlint reads code only, and exits non-zero when handed nothing it can parse.
-select_code() {
-  grep -E '\.(cjs|cts|js|jsx|mjs|mts|ts|tsx)$' "$1" >"$2" || true
-}
-
-# oxfmt does not format Markdown; Prettier does, and skips anything .prettierignore lists.
-select_md() {
-  grep -E '\.md$' "$1" >"$2" || true
-}
-
 if [ -s "$work/fixable" ]; then
-  run_on "$work/fixable" pnpm exec oxfmt --no-error-on-unmatched-pattern --
-  select_md "$work/fixable" "$work/fixable-md"
-  run_on "$work/fixable-md" pnpm exec prettier --write --log-level warn --
-  select_code "$work/fixable" "$work/fixable-code"
-  run_on "$work/fixable-code" pnpm exec oxlint --fix --
-  run_on "$work/fixable" git add --
+  profile_fix "$work/fixable"
+  # Literal pathspecs, so a name such as `app/[id]/page.tsx` is not read as a
+  # pattern that also stages the unstaged changes of `app/i/page.tsx`.
+  run_on "$work/fixable" git --literal-pathspecs add --
 fi
 
-run_on "$work/staged" pnpm exec oxfmt --check --no-error-on-unmatched-pattern --
-select_md "$work/staged" "$work/md"
-run_on "$work/md" pnpm exec prettier --check --log-level warn --
-select_code "$work/staged" "$work/code"
-run_on "$work/code" pnpm exec oxlint --
+profile_check "$work/staged"
