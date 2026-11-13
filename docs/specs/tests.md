@@ -6,7 +6,7 @@ scope: Test categories, where each lives, the conformance and security suites, a
 
 # Tests
 
-This document defines how Symbolon is tested: what kinds of tests exist, where they live, how they run, and what they are expected to cover. The conventions for writing an individual test are in the [coding guidelines](../guidelines/code.md#tests), and the runners, file names, configuration, and commands of the project's stack are in [stack tests](stack-tests.md).
+This document defines how Symbolon is tested: what kinds of tests exist, where they live, how they run, and what they are expected to cover. The conventions for writing an individual test are in the [coding guidelines](../guidelines/code.md#testing), and the runners, file names, configuration, and commands of the project's stack are in [stack tests](stack-tests.md).
 
 ## Principles
 
@@ -34,7 +34,7 @@ Manual usage scenarios, such as a playground used during development, are outsid
 ### Unit tests
 
 - A test file is named after the file it covers, as [stack tests](stack-tests.md#runners-and-file-names) gives.
-- What to mock, and what to test against real temporary state instead, is owned by the [coding guidelines](../guidelines/code.md#tests).
+- What to mock, and what to test against real temporary state instead, is owned by the [coding guidelines](../guidelines/code.md#testing).
 - Do not import test utilities across distant packages, except from a package or subpath that exists to share them.
 
 ### Integration tests
