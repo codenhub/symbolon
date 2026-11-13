@@ -42,3 +42,8 @@ body:
     attributes:
       label: Reproduction
       description: The smallest steps that show it, including the relying party or OIDC library involved.
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround in place
+      description: What you did to keep going, and where, so it can be removed once this is fixed.

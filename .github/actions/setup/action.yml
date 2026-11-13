@@ -15,6 +15,7 @@ runs:
         node-version-file: .nvmrc
         cache: pnpm
 
+    # A lockfile that disagrees with the manifests fails here rather than being rewritten in CI.
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
       shell: bash
