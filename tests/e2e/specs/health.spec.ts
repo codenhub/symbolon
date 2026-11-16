@@ -7,5 +7,6 @@ test("the health check answers with the security headers", async ({ page }) => {
   const headers = response?.headers() ?? {};
   expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
   expect(headers["x-content-type-options"]).toBe("nosniff");
+  expect(headers["referrer-policy"]).toBe("no-referrer");
   expect(headers["cache-control"]).toBe("no-store");
 });

@@ -1,6 +1,6 @@
 ---
 status: APPROVED
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 scope: Test categories, where each lives, the conformance and security suites, and coverage expectations.
 ---
 
@@ -40,7 +40,7 @@ Manual usage scenarios, such as a playground used during development, are outsid
 ### Integration tests
 
 - Integration tests live inside the package or app they belong to. Do not add a repository-root `tests/` directory by default.
-- When a journey or orchestration genuinely spans packages, a dedicated workspace package for those tests is allowed, rather than placing them in one of the packages they cross. `tests/e2e` is one: each journey crosses every package and runs against both runtimes.
+- When a journey or orchestration genuinely spans packages, a dedicated workspace package for those tests is allowed, rather than placing them in one of the packages they cross. `tests/e2e` is one: each journey crosses every package. It runs against the Node.js server; the Worker is covered by its integration tests in workerd.
 
 ### Browser tests
 

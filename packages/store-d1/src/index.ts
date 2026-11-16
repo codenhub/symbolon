@@ -35,8 +35,9 @@ export function createD1Store(db: D1DatabaseLike): Store {
         .run();
       const applied = await db.prepare(`SELECT id FROM ${MIGRATIONS_TABLE}`).all<{ id: string }>();
       // D1 has no interactive transactions, so each migration is one batch: its statements and the row that
-      // records it apply together. Two isolates migrating at once both try to insert the same id, and the
-      // primary key rolls back the second batch whole.
+      // records it apply together. When two isolates migrate at once, the second batch fails, on a statement
+      // or on the primary key of the row, and rolls back whole; that isolate's request fails and the Worker
+      // migrates again on its next one, finding nothing left to apply.
       const batches = pendingMigrations(applied.results.map((row) => row.id)).map((migration) => [
         ...migration.sqlite.map((statement) => db.prepare(statement)),
         db
