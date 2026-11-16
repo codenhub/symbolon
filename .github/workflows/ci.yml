@@ -157,6 +157,16 @@ jobs:
       - name: Set up Buildx
         uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
+      # The Dockerfile's default Node.js version is the one local builds get, so it must be the one `.nvmrc`
+      # pins (docs/workspace.md, "Toolchain").
+      - name: Check the Node.js version in the Dockerfile
+        run: |
+          expected="$(cat .nvmrc)"
+          if ! grep -qx "ARG NODE_VERSION=$expected" apps/node/Dockerfile; then
+            echo "::error file=apps/node/Dockerfile::NODE_VERSION does not match .nvmrc ($expected)."
+            exit 1
+          fi
+
       # One architecture here, loaded into the runner's Docker; the release builds every architecture.
       - name: Build the image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -179,7 +189,11 @@ jobs:
             exit 1
           fi
 
-          if docker run --rm -e SYMBOLON_ISSUER=http://id.example.com -e SYMBOLON_SECRET="$(openssl rand -base64 32)" symbolon:ci; then
+          # A server that starts never exits, so the run is bounded: `timeout` exits 124 when it had to stop it.
+          code=0
+          timeout 30 docker run --rm --name refused -e SYMBOLON_ISSUER=http://id.example.com             -e SYMBOLON_SECRET="$(openssl rand -base64 32)" symbolon:ci || code=$?
+          docker rm -f refused >/dev/null 2>&1 || true
+          if [ "$code" -eq 0 ] || [ "$code" -eq 124 ]; then
             echo "::error::The image started with a plain-HTTP issuer outside dev mode."
             exit 1
           fi
