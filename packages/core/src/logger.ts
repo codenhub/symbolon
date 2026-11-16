@@ -12,10 +12,11 @@ export interface Logger {
 
 const REDACTED = "[redacted]";
 // Matched against field names anywhere in the fields, in any letter case: `clientSecret`, `refresh_token`,
-// `Authorization`, `set-cookie`.
-const SECRET_NAME = /secret|passw|token|code|authorization|cookie|credential|session/i;
-// Credentials written into a URL, as a database URL carries them: `postgres://user:password@host`.
-const URL_CREDENTIALS = /(\/\/)[^/\s:@]*:[^/\s@]*@/g;
+// `Authorization`, `set-cookie`, `privateKey`. It errs towards redacting: `keyId` is redacted too.
+const SECRET_NAME = /secret|passw|token|code|authorization|cookie|credential|session|key/i;
+// Credentials written into a URL, with or without a password: `postgres://user:password@host`,
+// `https://token@host`.
+const URL_CREDENTIALS = /(\/\/)[^/\s@]*@/g;
 const MAX_DEPTH = 4;
 
 function redact(value: unknown, depth: number): unknown {
@@ -25,6 +26,14 @@ function redact(value: unknown, depth: number): unknown {
   if (value instanceof Error) {
     // Not its other properties, which for a driver error can hold the connection options.
     return { name: value.name, message: redact(value.message, depth) };
+  }
+  if (typeof value === "bigint") {
+    // `JSON.stringify` throws on a bigint.
+    return value.toString();
+  }
+  if (typeof value === "function") {
+    // Dropped, so `JSON.stringify` never calls a `toJSON` it was handed, whose result would skip redaction.
+    return undefined;
   }
   if (value === null || typeof value !== "object") {
     return value;

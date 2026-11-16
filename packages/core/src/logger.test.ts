@@ -16,16 +16,24 @@ describe("createLogger", () => {
     expect(lines).toEqual([{ level: "error", event: "request_failed", method: "GET", path: "/healthz" }]);
   });
 
-  it.each(["secret", "clientSecret", "password", "refresh_token", "Authorization", "set-cookie", "code"])(
-    "shouldRedactAFieldNamed%s",
-    (name) => {
-      const { lines, logger } = capture();
+  it.each([
+    "secret",
+    "clientSecret",
+    "password",
+    "refresh_token",
+    "Authorization",
+    "set-cookie",
+    "code",
+    "privateKey",
+    "private_key",
+    "apiKey",
+  ])("shouldRedactAFieldNamed%s", (name) => {
+    const { lines, logger } = capture();
 
-      logger.error("failed", { [name]: "value-under-test", nested: { [name]: "value-under-test" } });
+    logger.error("failed", { [name]: "value-under-test", nested: { [name]: "value-under-test" } });
 
-      expect(JSON.stringify(lines)).not.toContain("value-under-test");
-    },
-  );
+    expect(JSON.stringify(lines)).not.toContain("value-under-test");
+  });
 
   it("shouldRedactCredentialsInAUrl", () => {
     const { lines, logger } = capture();
@@ -34,6 +42,30 @@ describe("createLogger", () => {
 
     expect(JSON.stringify(lines)).not.toContain("pw-under-test");
     expect(JSON.stringify(lines)).toContain("postgres://[redacted]@db:5432/x");
+  });
+
+  it("shouldRedactAUserNameWithoutAPasswordInAUrl", () => {
+    const { lines, logger } = capture();
+
+    logger.error("failed", { url: "https://user-under-test@example.invalid/resource" });
+
+    expect(JSON.stringify(lines)).not.toContain("user-under-test");
+  });
+
+  it("shouldNotRunAToJsonMethodItWasGiven", () => {
+    const { lines, logger } = capture();
+
+    logger.error("failed", { details: { toJSON: () => ({ token: "hook-under-test" }) } });
+
+    expect(JSON.stringify(lines)).not.toContain("hook-under-test");
+  });
+
+  it("shouldWriteABigintAsText", () => {
+    const { lines, logger } = capture();
+
+    logger.error("failed", { attempt: 1n });
+
+    expect(lines).toEqual([{ level: "error", event: "failed", attempt: "1" }]);
   });
 
   it("shouldReduceAnErrorToItsNameAndMessage", () => {
