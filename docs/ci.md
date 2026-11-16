@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 scope: The CI workflow, the shared setup action, action pinning, releases, dependency updates, and branch protection.
 ---
 
@@ -18,12 +18,12 @@ The composite action `.github/actions/setup` sets up the toolchain and installs 
 
 Every job runs on every pull request, every merge-queue check, and every push to `main`. The workspace is small enough that a full run is a few minutes, so there is no changed-package selection to get wrong.
 
-| Job                | Checks                                                                                                                                                                                                             |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Verify`           | `pnpm verify`, with a PostgreSQL 17 service so the PostgreSQL conformance tests run instead of skipping. This covers SQLite, D1 and the Worker in workerd, and every build. Then the `Working tree is clean` step. |
-| `End-to-end (...)` | The Playwright suites, one job per engine, in the Playwright image of the version the lockfile pins.                                                                                                               |
-| `End-to-end`       | Passes only when every engine job did. This is the check a branch rule requires, since the matrix reports one check per engine.                                                                                    |
-| `Docker image`     | Builds the image for one architecture, and checks that it runs as non-root, refuses a plain-HTTP issuer, becomes healthy on its own health check, and writes its database to the volume.                           |
+| Job                | Checks                                                                                                                                                                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Verify`           | `pnpm verify`, with a PostgreSQL 17 service so the PostgreSQL conformance tests run instead of skipping; with `CI` set and no server configured, they fail instead. This covers SQLite, D1 and the Worker in workerd, and every build. Then the `Working tree is clean` step. |
+| `End-to-end (...)` | The Playwright suites, one job per engine, in the Playwright image of the version the lockfile pins.                                                                                                                                                                          |
+| `End-to-end`       | Passes only when every engine job did. This is the check a branch rule requires, since the matrix reports one check per engine.                                                                                                                                               |
+| `Docker image`     | Checks that the Dockerfile's `NODE_VERSION` matches `.nvmrc`, builds the image for one architecture, and checks that it runs as non-root, refuses a plain-HTTP issuer within 30 seconds, becomes healthy on its own health check, and writes its database to the volume.      |
 
 Wrangler's telemetry is turned off for the whole workflow (`WRANGLER_SEND_METRICS=false`), as [invariant 11](specs/invariants.md#11-free-forever) asks of anything that runs on Symbolon's behalf.
 
@@ -63,17 +63,19 @@ gh api repos/actions/checkout/commits/v7.0.1 --jq .sha
 
 ## Releases: `.github/workflows/release.yml`
 
-A tag `v<version>` on a commit of `main` publishes the image to `ghcr.io/<owner>/symbolon` for `linux/amd64` and `linux/arm64`, tagged with the version, the minor line (`0.1`) and, for a version without a pre-release suffix, `latest`. The image carries an SBOM and build provenance. The workflow refuses a tag that does not match `version` in the root `package.json`.
+A tag `v<version>` on a commit of `main` publishes the image to `ghcr.io/<owner>/symbolon` for `linux/amd64` and `linux/arm64`, tagged with the version, the minor line (`0.1`) and, for a version without a pre-release suffix, `latest`. The image carries an SBOM and build provenance. The workflow refuses a tag on a commit `main` has not reached, since anyone who can push a tag can push it on any commit, and a tag that does not match `version` in the root `package.json`. The `linux/arm64` image is built but never run in CI.
 
 The Workers template is not published: an operator deploys it from a checkout of the tag, as [the operator guide](guides/operator.md#cloudflare-workers) describes.
 
 ## Dependency updates
 
-`.github/dependabot.yml` proposes weekly updates for the GitHub Actions, including the composite actions under `.github/actions/`, the Docker base image, and the npm dependencies, with the `@codenhub/*` packages in a group of their own because their updates often need code changes here. It moves an action's SHA and its version comment together, so a pin and its label cannot drift apart. npm updates arrive as catalog changes in `pnpm-workspace.yaml`, with the lockfile, as [Workspace](workspace.md#versions) describes. Every update pull request is labelled `type:chore`.
+`.github/dependabot.yml` proposes weekly updates for the GitHub Actions, including the composite actions under `.github/actions/`, and the npm dependencies, with the `@codenhub/*` packages in a group of their own because their updates often need code changes here. It moves an action's SHA and its version comment together, so a pin and its label cannot drift apart. npm updates arrive as catalog changes in `pnpm-workspace.yaml`, with the lockfile, as [Workspace](workspace.md#versions) describes. Every update pull request is labelled `type:chore`.
 
-The groups take minor and patch updates only, so a week brings at most one pull request per group: `codenhub` and `toolchain` for npm, and `actions` for each listed directory, since Dependabot groups each directory on its own. Two pull requests for the actions in one week, or two for npm, is the configuration working, not a duplicate; the Docker base image has no group and gets a pull request per update. A major update, such as Vitest 4 to 5, arrives as a pull request of its own: it is a decision that may need code changes, and inside a group it would hold the routine updates back until it is dealt with.
+The groups take minor and patch updates only, so a week brings at most one pull request per group: `codenhub` and `toolchain` for npm, and `actions` for each listed directory, since Dependabot groups each directory on its own. Two pull requests for the actions in one week, or two for npm, is the configuration working, not a duplicate. A major update, such as Vitest 4 to 5, arrives as a pull request of its own: it is a decision that may need code changes, and inside a group it would hold the routine updates back until it is dealt with.
 
 A dependency held back for a known breakage gets an `ignore` entry with the reason and the condition for removing it.
+
+The Docker base image is left out. Its tag is `node:${NODE_VERSION}-alpine`, and `NODE_VERSION` moves by hand with `.nvmrc`, which the `Docker image` job checks it matches ([workspace](workspace.md#toolchain)). A Node.js patch release is therefore picked up by raising `.nvmrc` and the Dockerfile together.
 
 Renovate does the same job, and was rejected: it runs as a GitHub App with a configuration of its own, while Dependabot is built into GitHub and already raises the repository's security updates.
 
