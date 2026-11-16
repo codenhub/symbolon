@@ -6,8 +6,14 @@
 **/playwright-report
 **/*.tsbuildinfo
 **/.env
+**/.env.*
 **/.dev.vars
+**/.dev.vars.*
+**/*.db
+**/*.db-shm
+**/*.db-wal
 data
+apps/node/data
 .git
 .github
 .claude
