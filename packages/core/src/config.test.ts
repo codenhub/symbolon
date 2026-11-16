@@ -8,13 +8,31 @@ describe("loadConfig", () => {
   it("shouldReadAnHttpsIssuer", () => {
     const config = loadConfig({ SYMBOLON_ISSUER: "https://id.example.com", SYMBOLON_SECRET: SECRET });
 
-    expect(config).toEqual({ issuer: "https://id.example.com/", secret: SECRET, isDevMode: false });
+    expect(config).toEqual({ issuer: "https://id.example.com", secret: SECRET, isDevMode: false });
   });
 
   it("shouldAcceptAPrivateHostName", () => {
     const config = loadConfig({ SYMBOLON_ISSUER: "https://sso.corp.lan", SYMBOLON_SECRET: SECRET });
 
-    expect(config.issuer).toBe("https://sso.corp.lan/");
+    expect(config.issuer).toBe("https://sso.corp.lan");
+  });
+
+  it.each([
+    ["https://id.example.com/", "https://id.example.com"],
+    ["https://ID.example.com:443", "https://id.example.com"],
+    ["https://example.com/sso/", "https://example.com/sso"],
+    ["https://example.com/sso", "https://example.com/sso"],
+  ])("shouldWriteTheIssuer%sInOneForm", (written, issuer) => {
+    expect(loadConfig({ SYMBOLON_ISSUER: written, SYMBOLON_SECRET: SECRET }).issuer).toBe(issuer);
+  });
+
+  it.each([
+    "https://id.example.com/?a=1",
+    "https://id.example.com/?",
+    "https://id.example.com/#x",
+    "https://u:p@id.example.com",
+  ])("shouldRefuseTheIssuer%s", (written) => {
+    expect(() => loadConfig({ SYMBOLON_ISSUER: written, SYMBOLON_SECRET: SECRET })).toThrow(/SYMBOLON_ISSUER/);
   });
 
   it("shouldRefusePlainHttpOutsideDevMode", () => {
