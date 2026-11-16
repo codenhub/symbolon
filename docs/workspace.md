@@ -65,7 +65,7 @@ oxfmt formats everything it understands except Markdown; Prettier formats only M
 
 Every third-party dependency version is declared once, in the catalog in `pnpm-workspace.yaml`, and referred to as `catalog:` in each `package.json`. No two `package.json` files can therefore declare different versions of one dependency by accident, though the lockfile can still resolve a transitive dependency to more than one version, and an upgrade is a one-line change that Dependabot can propose ([CI](ci.md#dependency-updates)). A workspace package depends on another as `workspace:*`, and a `peerDependencies` range says what a consumer may install, so neither is a catalog entry.
 
-`@types/node` never takes a major update from Dependabot. Its major follows the Node.js line in `engines` and `.nvmrc`, because types for a newer line accept APIs the pinned runtime does not have, so it moves by hand, with `.nvmrc`. Minor and patch updates still arrive, and can type a later minor of the same line than `.nvmrc` pins, such as `^24.19.2` against Node.js 24.14.1: an API added within the line can then type-check and fail at run time. The ignore rule does not close that gap; only the major is held.
+`@types/node` never takes a major update from Dependabot. Its major follows the Node.js line in `engines` and `.nvmrc`, because types for a newer line accept APIs the pinned runtime does not have, so it moves by hand, with `.nvmrc`. Minor and patch updates still arrive, and can type a later minor of the same line than `.nvmrc` pins, such as `@types/node` 26.20 against Node.js 26.13.1: an API added within the line can then type-check and fail at run time. The ignore rule does not close that gap; only the major is held.
 
 The `@codenhub/*` packages are catalog entries like any other. When a fix Symbolon waits on is released upstream, raising the entry is the change that removes the workarounds that name it ([contributing](../CONTRIBUTING.md#a-defect-found-mid-task)).
 
@@ -81,6 +81,8 @@ Local and CI runs resolve the same versions, each declared once:
 | `pnpm-workspace.yaml` `engineStrict` | Makes an install outside `engines` fail         |
 
 CI reads those same files rather than repeating a version: `pnpm/action-setup` takes pnpm from `packageManager`, and `actions/setup-node` takes Node.js from `.nvmrc`, both in the [setup action](ci.md#toolchain), which then installs with `--frozen-lockfile`.
+
+`.nvmrc` pins a release of the Node.js line in Active LTS: the line with the longest support ahead of it, and the one the Node.js website offers by default, so a new contributor's install meets `engines`. When a new line enters Active LTS each October, `.nvmrc`, `engines`, `@types/node`, `NODE_VERSION` in `apps/node/Dockerfile` and the `target` in `apps/node/scripts/build.mjs` move to it together, in one change. The Docker image is the runtime operators get, so this is also the Node.js line Symbolon supports.
 
 `engineStrict` is deliberate friction. A patch-level difference rarely matters, and the one time it does, the failure looks like a bug in the change under review rather than a difference in the runtime. It is set in `pnpm-workspace.yaml` because pnpm ignores `engine-strict` in `.npmrc`: with `engine-strict=true` there and an `engines` range the Node.js in use did not meet, `pnpm install` printed `Unsupported engine` and went on, on pnpm 11.7.0; with `engineStrict: true` in `pnpm-workspace.yaml` it stopped.
 
