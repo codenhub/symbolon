@@ -1,6 +1,9 @@
 # Prettier governs Markdown only in this repository; oxfmt owns every other
 # format. The root scripts always hand Prettier `**/*.md`, so this file only
-# carves out paths within that set.
+# carves out paths within that set to leave alone. oxfmt reads this file too,
+# so a path listed here is left alone by both formatters.
+
+# Build output and caches.
 **/node_modules/
 **/dist/
 **/coverage/

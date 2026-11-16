@@ -3,13 +3,7 @@
   "bracketSpacing": true,
   "htmlWhitespaceSensitivity": "ignore",
   "ignorePatterns": [
-    "dist/**",
-    "**/dist/**",
-    "**/.wrangler/**",
-    "coverage/**",
-    "**/test-results/**",
-    "**/playwright-report/**",
-    "pnpm-lock.yaml",
+    // Committed paths to leave unformatted. oxfmt already skips what .gitignore and .prettierignore list.
     "**/*.md"
   ],
   "printWidth": 120,

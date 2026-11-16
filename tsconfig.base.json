@@ -1,6 +1,9 @@
 {
+  // The compiler settings every project shares. tsconfig.runtime-agnostic.json and tsconfig.node.json add
+  // what each runtime needs, `lib` and `types`, and each package's tsconfig extends one of them.
   "compilerOptions": {
     "target": "ES2024",
+    // Bundlers and Vitest resolve imports, so type-checking follows their rules rather than Node's.
     "module": "Preserve",
     "moduleResolution": "bundler",
     "strict": true,
@@ -11,6 +14,10 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
+    // Type-checking only: each package's build tool emits its own output. `composite` lets the root
+    // tsconfig.json reference the project, so `tsc -b` checks every package in one run. Each project sets
+    // its own `tsBuildInfoFile` under `./node_modules/.cache/`: a path set here would resolve against this
+    // file, and every project would write the same one.
     "composite": true,
     "noEmit": true
   }

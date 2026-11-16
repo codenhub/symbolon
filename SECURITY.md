@@ -4,7 +4,7 @@ Symbolon is an identity provider, so a vulnerability in it can expose every app 
 
 ## Reporting a vulnerability
 
-Report it privately through [GitHub's private vulnerability reporting](https://github.com/codenhub/symbolon/security/advisories/new), not in a public issue. Include the version or commit, the runtime (Docker with SQLite or PostgreSQL, or Workers), the impact, and the smallest reproduction you have.
+Report it privately through [GitHub's private vulnerability reporting](https://github.com/codenhub/symbolon/security/advisories/new), not in a public issue. Include the version or commit, the runtime (Docker with SQLite or PostgreSQL, or Workers), the impact, and the smallest reproduction you have. Remove secrets, tokens, and personal data from anything you paste.
 
 A report is acknowledged on GitHub, and the advisory stays private until a fixed image is published.
 

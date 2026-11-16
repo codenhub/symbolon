@@ -51,7 +51,9 @@ From PowerShell or `cmd`, which have no `sh`, run it through the one Git for Win
 git -c "alias.labels=!sh .github/labels.sh" labels
 ```
 
-It never deletes a label: deleting one strips it from every issue that carries it, so a label that is no longer listed is removed by hand. Renaming a label on GitHub, rather than creating it again, keeps it on the issues that carry it.
+It never deletes a label: deleting one strips it from every issue that carries it, so a label that is no longer listed is removed by hand.
+
+The `type:` and `status:` labels do not depend on the project, so a GitHub organization can set them as its default labels, and a new repository then starts with the labels the issue forms and Dependabot apply. Renaming a label on GitHub, rather than creating it again, keeps it on the issues that carry it.
 
 ### A defect found mid-task
 
