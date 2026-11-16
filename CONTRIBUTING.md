@@ -199,7 +199,7 @@ git tag v0.0.1
 git push origin v0.0.1
 ```
 
-The release workflow refuses a tag that does not match `package.json`. Pushing a release tag and deploying are outward-facing actions. An agent asks first and never does either on its own initiative.
+The release workflow refuses a tag on a commit `main` has not reached, or one that does not match `package.json`. Pushing a release tag and deploying are outward-facing actions. An agent asks first and never does either on its own initiative.
 
 ## Hooks
 

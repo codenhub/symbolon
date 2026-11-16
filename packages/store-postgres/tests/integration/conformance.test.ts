@@ -7,8 +7,12 @@ import { describe, it } from "vitest";
 import { createPostgresStore } from "../../src/index";
 
 // Runs only against a real server. CI provides one; locally, start one and set the variable, as
-// docs/specs/tests.md describes. Skipped rather than failed, so `pnpm test` works without Docker.
+// docs/tooling.md, "PostgreSQL tests", describes. Skipped rather than failed, so `pnpm test` works without
+// Docker, except in CI, where a missing variable would otherwise pass the job with the adapter untested.
 const url = process.env["SYMBOLON_TEST_POSTGRES_URL"];
+if (url === undefined && process.env["CI"] !== undefined) {
+  throw new Error("SYMBOLON_TEST_POSTGRES_URL is not set; CI must run the PostgreSQL tests.");
+}
 
 describe.skipIf(url === undefined)("createPostgresStore", () => {
   for (const conformanceCase of storeConformanceCases) {
