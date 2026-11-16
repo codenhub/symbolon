@@ -65,7 +65,7 @@ oxfmt formats everything it understands except Markdown; Prettier formats only M
 
 Every third-party dependency version is declared once, in the catalog in `pnpm-workspace.yaml`, and referred to as `catalog:` in each `package.json`. No two `package.json` files can therefore declare different versions of one dependency by accident, though the lockfile can still resolve a transitive dependency to more than one version, and an upgrade is a one-line change that Dependabot can propose ([CI](ci.md#dependency-updates)). A workspace package depends on another as `workspace:*`, and a `peerDependencies` range says what a consumer may install, so neither is a catalog entry.
 
-`@types/node` never takes a major update from Dependabot. Node's types follow the Node.js release in `engines` and `.nvmrc`, and types for a newer Node accept APIs the pinned runtime does not have; they move by hand, with `.nvmrc`.
+`@types/node` never takes a major update from Dependabot. Its major follows the Node.js line in `engines` and `.nvmrc`, because types for a newer line accept APIs the pinned runtime does not have, so it moves by hand, with `.nvmrc`. Minor and patch updates still arrive, and can type a later minor of the same line than `.nvmrc` pins, such as `^24.19.2` against Node.js 24.14.1: an API added within the line can then type-check and fail at run time. The ignore rule does not close that gap; only the major is held.
 
 The `@codenhub/*` packages are catalog entries like any other. When a fix Symbolon waits on is released upstream, raising the entry is the change that removes the workarounds that name it ([contributing](../CONTRIBUTING.md#a-defect-found-mid-task)).
 

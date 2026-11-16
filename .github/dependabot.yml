@@ -31,8 +31,9 @@ updates:
     schedule:
       interval: weekly
     labels: ["type:chore"]
-    # Node's types follow the Node release in `engines` and `.nvmrc`, so they move when Node does, not on
-    # their own: types for a newer Node accept APIs the pinned runtime does not have.
+    # The major of Node's types follows the Node line in `engines` and `.nvmrc` and moves by hand with it:
+    # types for a newer line accept APIs the pinned runtime does not have. Minor and patch updates still
+    # arrive (docs/workspace.md, "Versions").
     ignore:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
