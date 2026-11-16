@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 scope: The root script names and what each guarantees, the shared tool configurations, the pinned toolchain, install rules, and how dependency versions are declared.
 ---
 
@@ -44,9 +44,9 @@ Symbolon adds these scripts:
 | `package.json`                   | The root scripts, the tooling as `devDependencies`, the supported Node.js and pnpm ranges (`engines`), and the exact pnpm version (`packageManager`). `.nvmrc` pins Node.js.                                                                                                                                            |
 | `pnpm-workspace.yaml`            | The workspace globs, the catalog of every dependency version, the supply-chain rules for installs ([below](#dependency-installs)), and `engineStrict`, so an install outside `engines` fails.                                                                                                                           |
 | `.nvmrc`                         | The exact Node.js version, read by `nvm` and by CI.                                                                                                                                                                                                                                                                     |
-| `.editorconfig`                  | Indentation, final newline, and no hard wrap in Markdown.                                                                                                                                                                                                                                                               |
+| `.editorconfig`                  | Indentation, final newline, LF line endings, and no hard wrap in Markdown.                                                                                                                                                                                                                                              |
 | `.gitattributes`                 | LF line endings in the repository and the working tree on every platform, and the binary file types.                                                                                                                                                                                                                    |
-| `.oxfmtrc.json`                  | oxfmt: 120 columns, double quotes, semicolons, trailing commas, sorted imports and `package.json` keys. Markdown is excluded; Prettier owns it.                                                                                                                                                                         |
+| `.oxfmtrc.json`                  | oxfmt: 120 columns, double quotes, semicolons, trailing commas, sorted imports and `package.json` keys. Markdown is excluded; Prettier owns it. Nothing else is listed: oxfmt already skips what `.gitignore` and `.prettierignore` list, and the lockfile.                                                             |
 | `.prettierrc.json`               | Prettier, for Markdown only: `proseWrap: "never"`, so a paragraph is one line and a diff shows the sentence that changed.                                                                                                                                                                                               |
 | `.prettierignore`                | Paths inside the Markdown set Prettier leaves alone: build output and caches.                                                                                                                                                                                                                                           |
 | `.oxlintrc.json`                 | oxlint's plugins and rules. `no-console` is an error except in the two entrypoints that print startup failures, `apps/node/scripts/`, `.githooks/` and tests, where printing is the point. A scoped override turns off two Vitest rules for the conformance suites ([stack tests](specs/stack-tests.md#configuration)). |
@@ -64,6 +64,8 @@ oxfmt formats everything it understands except Markdown; Prettier formats only M
 ### Versions
 
 Every third-party dependency version is declared once, in the catalog in `pnpm-workspace.yaml`, and referred to as `catalog:` in each `package.json`. No two `package.json` files can therefore declare different versions of one dependency by accident, though the lockfile can still resolve a transitive dependency to more than one version, and an upgrade is a one-line change that Dependabot can propose ([CI](ci.md#dependency-updates)). A workspace package depends on another as `workspace:*`, and a `peerDependencies` range says what a consumer may install, so neither is a catalog entry.
+
+`@types/node` never takes a major update from Dependabot. Its major follows the Node.js line in `engines` and `.nvmrc`, because types for a newer line accept APIs the pinned runtime does not have, so it moves by hand, with `.nvmrc`. Minor and patch updates still arrive, and can type a later minor of the same line than `.nvmrc` pins, such as `^24.19.2` against Node.js 24.14.1: an API added within the line can then type-check and fail at run time. The ignore rule does not close that gap; only the major is held.
 
 The `@codenhub/*` packages are catalog entries like any other. When a fix Symbolon waits on is released upstream, raising the entry is the change that removes the workarounds that name it ([contributing](../CONTRIBUTING.md#a-defect-found-mid-task)).
 

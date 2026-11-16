@@ -3,8 +3,8 @@ packages:
   - "packages/*"
   - "tests/*"
 
-# Every version is declared once, here, and packages refer to it as `catalog:`,
-# so the workspace can never hold two versions of one dependency by accident.
+# Every version is declared once, here, and packages refer to it as `catalog:`, so the workspace can never
+# hold two versions of one dependency by accident. A new third-party dependency adds its version here.
 catalog:
   "@codenhub/i18n": ^0.1.0
   "@codenhub/icons": ^0.2.1
@@ -26,13 +26,20 @@ catalog:
   vitest: ^5.0.5
   wrangler: ^4.120.0
 
+# Supply-chain rules, applied to every install, local and in CI alike (docs/workspace.md, "Dependency installs").
+# Refuses a transitive dependency that resolves to a git repository or a tarball URL instead of the registry.
 blockExoticSubdeps: true
+# Refuses a version published with weaker trust evidence (provenance, trusted publishing) than an earlier
+# version of the same package, a common sign of a compromised publish.
 trustPolicy: no-downgrade
+# The only dependencies whose install scripts may run, each with the reason. A dependency that needs one gets
+# an entry in the same change.
+# esbuild and workerd fetch their native binaries on install.
 allowBuilds:
   esbuild: true
   workerd: true
 
 # Makes pnpm refuse an install outside `engines` in package.json instead of only printing a warning, so a
-# mismatch surfaces before it turns into a failure no one can reproduce. It lives here because pnpm ignores
+# mismatch surfaces before it turns into a failure no one can reproduce (docs/workspace.md, "Toolchain"). It lives here because pnpm ignores
 # `engine-strict` in .npmrc: checked with pnpm 11.7.
 engineStrict: true
