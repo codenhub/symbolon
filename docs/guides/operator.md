@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-10-20
+last_updated: 2026-11-16
 scope: Running Symbolon: configuration, Docker, Cloudflare Workers, and backups.
 ---
 
@@ -37,15 +37,19 @@ It will encrypt the data that must be recoverable, such as signing keys and TOTP
 
 The image runs as a non-root user, keeps its data in the `/data` volume, and has a health check on `/healthz`. It speaks plain HTTP inside the container: put a TLS-terminating reverse proxy in front of it, and set `SYMBOLON_ISSUER` to the public `https://` URL.
 
+With `SYMBOLON_SECRET` set in your shell to the secret you [generated once](#the-master-secret), and the release you run in place of `0.1`:
+
 ```sh
 docker run -d --name symbolon -p 127.0.0.1:3000:3000 \
   -e SYMBOLON_ISSUER=https://id.example.com \
-  -e SYMBOLON_SECRET="$(openssl rand -base64 32)" \
+  -e SYMBOLON_SECRET \
   -v symbolon-data:/data \
-  ghcr.io/codenhub/symbolon:latest
+  ghcr.io/codenhub/symbolon:0.1
 ```
 
-Compose files for SQLite and for PostgreSQL are in `deploy/compose/`. Migrations run on every start.
+`-e SYMBOLON_SECRET` without a value passes the variable from your shell, so the secret stays off the command line. Name a release rather than `latest`, so an upgrade, which may migrate the database, happens when you choose.
+
+Compose files for SQLite and for PostgreSQL are in `deploy/compose/`; they take the release as `SYMBOLON_RELEASE`. With PostgreSQL, generate `POSTGRES_PASSWORD` with `openssl rand -hex 32`: the password is written into a database URL, where a character such as `@`, `/` or `:` would break it. Migrations run on every start.
 
 To build the image from a checkout, from the repository root:
 
