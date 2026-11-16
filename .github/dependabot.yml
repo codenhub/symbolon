@@ -3,10 +3,13 @@
 #
 # The groups take minor and patch updates only, so one week is one grouped pull request per group and
 # directory: Dependabot groups each listed directory on its own, so the actions can arrive as two pull
-# requests, and npm as two, `codenhub` and `toolchain`. The Docker base image has no group. A major update
+# requests, and npm as two, `codenhub` and `toolchain`. A major update
 # arrives as a pull request of its own, because it is a decision (it may need code changes) rather than
 # upkeep, and a group that mixes one in cannot be merged until the major is dealt with.
 # `docs/ci.md`, "Pinning third-party actions", records why the actions are updated this way.
+#
+# The Docker base image is not listed: its tag is `node:${NODE_VERSION}-alpine`, and NODE_VERSION moves by
+# hand with `.nvmrc`, which CI checks it matches (docs/workspace.md, "Toolchain").
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -19,12 +22,6 @@ updates:
       actions:
         patterns: ["*"]
         update-types: ["minor", "patch"]
-
-  - package-ecosystem: docker
-    directory: /apps/node
-    schedule:
-      interval: weekly
-    labels: ["type:chore", "app:node"]
 
   - package-ecosystem: npm
     directory: /

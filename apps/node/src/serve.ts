@@ -17,8 +17,10 @@ export interface ServeOptions {
 }
 
 function toRequest(incoming: IncomingMessage, origin: string, signal: AbortSignal): Request {
-  // The URL is built on the configured origin, never on the Host header, which the client controls.
-  const url = new URL(incoming.url ?? "/", origin);
+  // The URL is built on the configured origin, never on the Host header, which the client controls. The
+  // target is appended, not resolved: resolving `//evil.example/x` against the origin would make
+  // `evil.example` the host. `serve` has already refused any target that does not start with `/`.
+  const url = new URL(`${origin}${incoming.url ?? "/"}`);
   const headers = new Headers();
   for (const [name, value] of Object.entries(incoming.headers)) {
     for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value]) {

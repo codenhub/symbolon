@@ -12,7 +12,7 @@ export default defineConfig({
     baseURL: ORIGIN,
     trace: "retain-on-failure",
   },
-  // Project names end in their engine, so CI can select one engine per job with --project='*<engine>'.
+  // Each project is named after its engine, so CI runs one engine per job with --project=<engine>.
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },

@@ -23,6 +23,18 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history, so the next step can see whether the tag's commit is on main.
+          fetch-depth: 0
+
+      # Anyone who can push a tag can push it on any commit, such as one on an unreviewed branch, and the image
+      # would be published as `latest`. Only a commit main has reached is released.
+      - name: Check the tag is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag $GITHUB_REF_NAME is on a commit that is not on main."
+            exit 1
+          fi
 
       # The tag must name the version in package.json, so the image and the source agree on what they are.
       - name: Check the tag against package.json

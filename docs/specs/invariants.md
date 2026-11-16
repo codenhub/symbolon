@@ -32,7 +32,7 @@ Enforced by: not yet.
 
 Validate all request input (forms, query strings, JSON, headers) with `@codenhub/validation` at the boundary. Every input has a bounded size.
 
-Enforced by: the environment is validated by `loadConfig` (`packages/core/src/config.test.ts`) and, for the Node.js server's own variables, by `loadNodeConfig` (`apps/node/src/node-config.test.ts`). Request input: not yet; there is no route that reads any.
+Enforced by: the environment is validated by `loadConfig` (`packages/core/src/config.test.ts`) and, for the Node.js server's own variables, by `loadNodeConfig` (`apps/node/src/node-config.test.ts`). Request bodies are read with a byte limit by `readBody` (`packages/server/src/read-body.test.ts`), and request URLs are rebuilt on the issuer's origin by `issuerUrl` (`packages/server/src/request-url.test.ts`, `apps/node/tests/integration/serve.test.ts`). Request validation: not yet; there is no route that reads any input.
 
 ## 5. Web hygiene on every HTML response
 

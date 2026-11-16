@@ -66,13 +66,16 @@ Rejected: a `tsdown` build per package, as codenhub has. codenhub publishes its 
 
 There is no HTTP framework. `server` exposes `(request: Request) => Promise<Response>`, which Workers serves as is, and `apps/node/src/serve.ts` bridges `node:http` to it. This is provisional: [the scope's open question](scope.md#6-open-questions) on a framework versus an internal router is still open, and is decided when `server` has enough routes to compare the two on real code. Either choice keeps the Fetch handler as the boundary, so it changes `server` only.
 
-Request URLs are built on the configured issuer's origin, never on the `Host` header, which the client controls. `serve` refuses absolute-form request targets for the same reason.
+Request URLs are built on the configured issuer's origin, never on the host a request arrived on, which the client controls: the `Host` header on Node.js, and on Workers any hostname routed to the Worker. `createHandler` rebuilds every request's URL on the issuer's origin with `issuerUrl`, so both runtimes share the rule and a route never reads `request.url`. `serve` also refuses absolute-form request targets, and appends the target to the origin rather than resolving it, so a `//host/path` target stays a path. The Worker's `wrangler.jsonc` turns off `workers.dev` and preview URLs, so the issuer's custom domain is the only host it answers on.
+
+A route reads a request body with `readBody` in `server`, never with `request.text()` or `request.json()`: it reads at most the limit the route passes, whatever `Content-Length` says ([security](guidelines/security.md)).
 
 ## Storage
 
 - **Migrations** are one ordered list in `@symbolon/store`, each written once per dialect (SQLite, which D1 shares, and PostgreSQL) as a list of single statements, because D1's `prepare` takes one statement. Each adapter applies pending migrations in `migrate()`, in a transaction (a batch per migration on D1), recording applied ids in `symbolon_migrations`. The Node.js app migrates on startup; the Worker migrates on the first request of each isolate, which costs one read once the schema is current. Rejected: wrangler's D1 migration files, which would be a second copy of the schema that can drift from the other dialects.
 - **PostgreSQL driver:** [`postgres`](https://github.com/porsager/postgres) rather than `pg`. It has no dependencies, is ESM, and bundles into `dist/main.js`; `pg` brings `pg-pool`, `pg-types` and others, and its optional native binding complicates bundling.
 - **SQLite** runs on `node:sqlite`, built into Node.js, so the image needs no native module.
+- **Audit entries are written by the store method that makes the change** (invariants 7 and 8). Every mutating `Store` method takes the audit entry for its action and writes both in one transaction, or one batch on D1, so neither can land without the other; the store conformance suite proves it for each adapter. The method that adds the first audited change also adds the audit table, the conformance cases, and the "Enforced by" line of invariant 7. Rejected: a transaction callback on the store, `store.transaction(async (tx) => ...)`, which D1 cannot offer, since it has no interactive transactions and a batch's statements are fixed before it runs; and an audit write after the change, which a failure between the two loses.
 
 ## Dashboard
 

@@ -1,5 +1,6 @@
 import type { Config, Store } from "@symbolon/core";
 
+import { issuerUrl } from "./request-url";
 import { withSecurityHeaders } from "./security-headers";
 
 /** What {@link createHandler} needs from the runtime. */
@@ -26,10 +27,11 @@ function json(body: unknown, status: number): Response {
  * @returns A handler that never rejects: an unexpected error becomes a 500 response that names no detail.
  */
 export function createHandler(options: HandlerOptions): Handler {
-  const isHttps = new URL(options.config.issuer).protocol === "https:";
+  const issuer = new URL(options.config.issuer);
+  const isHttps = issuer.protocol === "https:";
 
   const route = async (request: Request): Promise<Response> => {
-    const { pathname } = new URL(request.url);
+    const { pathname } = issuerUrl(request, issuer.origin);
     if (pathname === "/healthz" && (request.method === "GET" || request.method === "HEAD")) {
       await options.store.ping();
       return json({ status: "ok" }, 200);
