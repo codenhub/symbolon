@@ -31,13 +31,14 @@ Defects and requests are tracked as GitHub issues, opened through the bug and fe
 
 Each issue carries one label from each group that applies:
 
-| Group     | Labels                                        | Says                                                        |
-| --------- | --------------------------------------------- | ----------------------------------------------------------- |
-| `type:`   | `bug`, `feature`, `security`, `docs`, `chore` | What kind of work it is                                     |
-| `pkg:`    | `core`, `server`, `store`                     | Which package it is in; `store` also covers the adapters    |
-| `app:`    | one per application member, by commit scope   | Which app it is in                                          |
-| `status:` | `needs-triage`, `blocked`                     | Why it is not moving, when it is not                        |
-| —         | `upstream`                                    | The issue waits on a change in an `@codenhub` package first |
+| Group     | Labels                                        | Says                                                     |
+| --------- | --------------------------------------------- | -------------------------------------------------------- |
+| `type:`   | `bug`, `feature`, `security`, `docs`, `chore` | What kind of work it is                                  |
+| `pkg:`    | `core`, `server`, `store`                     | Which package it is in; `store` also covers the adapters |
+| `app:`    | one per application member, by commit scope   | Which app it is in                                       |
+| `status:` | `needs-triage`, `blocked`, `upstream`         | Why it is not moving, when it is not                     |
+
+`status:upstream` means the issue waits on a change in an `@codenhub` package, as [below](#a-defect-found-mid-task) describes.
 
 `.github/labels.sh` holds the list, one `label` line per label. Add a line in the change that adds a member. After editing the list, create or update the labels on GitHub through `gh` by running it:
 
@@ -73,7 +74,7 @@ Then mark the workaround where it lives, naming the issue in full as `<owner>/<r
 
 Once the fix lands, searching for `<owner>/<repo>#123` finds every workaround to remove. A defect with no workaround blocks the task; say so, and the fix goes first, in its own pull request.
 
-A defect or gap in a codenhub package is fixed upstream, not around. Symbolon is the first real consumer of `@codenhub/oidc`, so its gaps will surface here. File the issue in codenhub, label the local issue that waits on it `upstream`, and mark the workaround with the upstream issue:
+A defect or gap in a codenhub package is fixed upstream, not around. Symbolon is the first real consumer of `@codenhub/oidc`, so its gaps will surface here. File the issue in codenhub, label the local issue that waits on it `status:upstream`, and mark the workaround with the upstream issue:
 
 ```sh
 gh issue create --repo codenhub/codenhub --title "oidc: <what is wrong>" --label "type:bug,pkg:oidc,found-in:external" --body "<what happened, what was expected, and the workaround>"

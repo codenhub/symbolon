@@ -24,7 +24,7 @@ Every other document in `docs/` is listed here. Adding, moving, or deleting one 
 | Document                                     | Contains                                                                                                         |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | [Code](guidelines/code.md)                   | Naming, design, errors, inputs and state, testing practices, the upstream-first rule, and documentation in code. |
-| [Documentation](guidelines/documentation.md) | Metadata, status and authority, recording decisions, exceptions, document roles, and layout.                     |
+| [Documentation](guidelines/documentation.md) | Metadata, prompts, status and authority, recording decisions, exceptions, document roles, and layout.            |
 | [Stack](guidelines/stack.md)                 | The conventions of TypeScript, JavaScript, and Node.js, and the tools that check them.                           |
 | [Security](guidelines/security.md)           | How the invariants turn into code: secrets, untrusted input, what stays out of logs, and reviewing a change.     |
 

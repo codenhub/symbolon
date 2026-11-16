@@ -1,6 +1,6 @@
 ---
 status: APPROVED
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 scope: Coding conventions for every package and app.
 ---
 
@@ -40,7 +40,7 @@ Name by domain intent. Avoid names that say only the type or the mechanism, such
 // Workaround for codenhub/codenhub#123: <what it works around>.
 ```
 
-Searching for the issue reference finds every workaround to remove once the fix is released. [CONTRIBUTING.md](../../CONTRIBUTING.md#a-defect-found-mid-task) describes filing the issue.
+Searching for the issue reference finds every workaround to remove once the fix is released. A third-party dependency is handled the same way: report the defect to its maintainers, and mark the workaround with their issue, in full as `<owner>/<repo>#<n>`; only the fix itself is theirs to make. [CONTRIBUTING.md](../../CONTRIBUTING.md#a-defect-found-mid-task) describes filing the issue.
 
 ## Code
 
