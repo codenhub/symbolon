@@ -66,7 +66,9 @@ Rejected: a `tsdown` build per package, as codenhub has. codenhub publishes its 
 
 There is no HTTP framework. `server` exposes `(request: Request) => Promise<Response>`, which Workers serves as is, and `apps/node/src/serve.ts` bridges `node:http` to it. This is provisional: [the scope's open question](scope.md#6-open-questions) on a framework versus an internal router is still open, and is decided when `server` has enough routes to compare the two on real code. Either choice keeps the Fetch handler as the boundary, so it changes `server` only.
 
-Request URLs are built on the configured issuer's origin, never on the `Host` header, which the client controls. `serve` refuses absolute-form request targets for the same reason.
+Request URLs are built on the configured issuer's origin, never on the host a request arrived on, which the client controls: the `Host` header on Node.js, and on Workers any hostname routed to the Worker. `createHandler` rebuilds every request's URL on the issuer's origin with `issuerUrl`, so both runtimes share the rule and a route never reads `request.url`. `serve` also refuses absolute-form request targets, and appends the target to the origin rather than resolving it, so a `//host/path` target stays a path. The Worker's `wrangler.jsonc` turns off `workers.dev` and preview URLs, so the issuer's custom domain is the only host it answers on.
+
+A route reads a request body with `readBody` in `server`, never with `request.text()` or `request.json()`: it reads at most the limit the route passes, whatever `Content-Length` says ([security](guidelines/security.md)).
 
 ## Storage
 
