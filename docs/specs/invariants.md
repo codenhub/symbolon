@@ -20,7 +20,7 @@ Enforced by: `loadConfig` refuses an `http://` issuer unless `SYMBOLON_DEV_MODE=
 
 No secret is stored in plaintext, and none appears in logs, errors, audit entries, or API responses. This covers passwords, client secrets, tokens, codes, TOTP secrets, recovery codes, private keys, the setup token, and reset links. Tokens and secrets are stored hashed. Data that has to be recoverable, like TOTP secrets and signing keys, is encrypted with the master secret. Client secrets are shown exactly once.
 
-Enforced by: configuration errors name variables, never values (`packages/core/src/config.test.ts`); an unexpected error becomes a 500 response with no detail (`packages/server/src/create-handler.test.ts`, `apps/node/tests/integration/serve.test.ts`). Storage of secrets: not yet.
+Enforced by: configuration errors name variables, never values (`packages/core/src/config.test.ts`); an unexpected error becomes a 500 response with no detail, and is logged with its path but not its query (`packages/server/src/create-handler.test.ts`, `apps/node/tests/integration/serve.test.ts`); the logger redacts fields with secret-bearing names and credentials in URLs (`packages/core/src/logger.test.ts`). Storage of secrets: not yet.
 
 ## 3. No user enumeration
 

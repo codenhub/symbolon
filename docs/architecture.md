@@ -10,19 +10,19 @@ This document records how the repository is put together and why; [the scope](sc
 
 ## Layout
 
-| Path                      | Package                    | Holds                                                                                                            | Runs on          |
-| ------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `packages/core`           | `@symbolon/core`           | Domain logic, the configuration, and the ports the runtimes implement (`Store`, later mail, clock, rate limits). | any              |
-| `packages/server`         | `@symbolon/server`         | The HTTP surface as one Fetch handler: OIDC endpoints, server-rendered pages, the admin API, web hygiene.        | any              |
-| `packages/store`          | `@symbolon/store`          | The migrations, the memory store, and the store conformance suite (`@symbolon/store/testing`).                   | any              |
-| `packages/store-sqlite`   | `@symbolon/store-sqlite`   | The SQLite adapter on `node:sqlite`.                                                                             | Node.js          |
-| `packages/store-postgres` | `@symbolon/store-postgres` | The PostgreSQL adapter.                                                                                          | Node.js          |
-| `packages/store-d1`       | `@symbolon/store-d1`       | The Cloudflare D1 adapter.                                                                                       | any (D1 binding) |
-| `apps/node`               | `@symbolon/node`           | The Node.js entrypoint, the `node:http` bridge, and the Docker image.                                            | Node.js          |
-| `apps/workers`            | `@symbolon/workers`        | The Workers entrypoint and the wrangler template.                                                                | Workers          |
-| `apps/dashboard`          | `@symbolon/dashboard`      | The admin and account single-page app.                                                                           | browser          |
-| `tests/e2e`               | `@symbolon/e2e`            | Playwright suites against a running instance.                                                                    | Node.js          |
-| `deploy/`                 | —                          | Compose examples for operators.                                                                                  | —                |
+| Path                      | Package                    | Holds                                                                                                                      | Runs on          |
+| ------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `packages/core`           | `@symbolon/core`           | Domain logic, the configuration, and the ports the runtimes implement (`Store`, `Logger`, later mail, clock, rate limits). | any              |
+| `packages/server`         | `@symbolon/server`         | The HTTP surface as one Fetch handler: OIDC endpoints, server-rendered pages, the admin API, web hygiene.                  | any              |
+| `packages/store`          | `@symbolon/store`          | The migrations, the memory store, and the store conformance suite (`@symbolon/store/testing`).                             | any              |
+| `packages/store-sqlite`   | `@symbolon/store-sqlite`   | The SQLite adapter on `node:sqlite`.                                                                                       | Node.js          |
+| `packages/store-postgres` | `@symbolon/store-postgres` | The PostgreSQL adapter.                                                                                                    | Node.js          |
+| `packages/store-d1`       | `@symbolon/store-d1`       | The Cloudflare D1 adapter.                                                                                                 | any (D1 binding) |
+| `apps/node`               | `@symbolon/node`           | The Node.js entrypoint, the `node:http` bridge, and the Docker image.                                                      | Node.js          |
+| `apps/workers`            | `@symbolon/workers`        | The Workers entrypoint and the wrangler template.                                                                          | Workers          |
+| `apps/dashboard`          | `@symbolon/dashboard`      | The admin and account single-page app.                                                                                     | browser          |
+| `tests/e2e`               | `@symbolon/e2e`            | Playwright suites against a running instance.                                                                              | Node.js          |
+| `deploy/`                 | —                          | Compose examples for operators.                                                                                            | —                |
 
 Every workspace package is `private`. Symbolon ships as a Docker image and a Workers template, not as npm packages, so no package has a public API to version; the boundary that matters is the one between packages, which the dependency rules below govern.
 
@@ -43,6 +43,8 @@ apps/node, apps/workers
 ### Ports live in core
 
 The `Store` interface is declared in `core`, where it is used, and `store` implements against it. The scope placed the storage interfaces in `store`; that makes `core` depend on `store` for its types while `store` needs `core`'s domain types for its records, a cycle. Declaring the port in its consumer is the usual way out, and it means a new runtime implements interfaces from one package.
+
+The `Logger` port differs in one way: `core` also implements it, with `createLogger`, so redaction (invariant 2) is written once. A runtime hands it only the sink, a function that writes a line; both apps pass `console.error`, which Docker and Workers Logs collect.
 
 ### `server` is separate from `core`
 

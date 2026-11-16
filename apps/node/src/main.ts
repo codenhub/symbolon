@@ -1,4 +1,4 @@
-import { ConfigError, loadConfig } from "@symbolon/core";
+import { ConfigError, createLogger, loadConfig } from "@symbolon/core";
 import { createHandler } from "@symbolon/server";
 
 import { loadNodeConfig } from "./node-config";
@@ -11,7 +11,8 @@ async function main(): Promise<void> {
   const store = openStore(nodeConfig.database);
   await store.migrate();
 
-  const { server, port } = await serve(createHandler({ config, store }), {
+  const logger = createLogger((line) => console.error(line));
+  const { server, port } = await serve(createHandler({ config, store, logger }), {
     origin: new URL(config.issuer).origin,
     port: nodeConfig.port,
     host: nodeConfig.host,

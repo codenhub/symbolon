@@ -22,7 +22,7 @@ Name by domain intent. Avoid names that say only the type or the mechanism, such
 
 - [The architecture](../architecture.md) owns the layout, the dependency direction and the runtime boundary. Code that needs to cross them changes that document first.
 - Code that must run on every runtime uses only Fetch-API types, Web Crypto and the ports. A runtime's API belongs in its app or adapter.
-- Prefer dependency injection to hard-coding. Time, randomness and storage arrive through ports, which is what makes the core testable and portable.
+- Prefer dependency injection to hard-coding. Time, randomness, storage and logging arrive through ports, which is what makes the core testable and portable. The clock and randomness ports are added by the first code that needs them.
 - Single responsibility: each function, class, and module does one thing well.
 - Group related files in a folder with one entrypoint that exports the folder's public surface.
 - High cohesion: logic that belongs together stays together.

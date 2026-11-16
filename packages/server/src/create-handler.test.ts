@@ -1,4 +1,4 @@
-import type { Config, Store } from "@symbolon/core";
+import { type Config, createLogger, type Store } from "@symbolon/core";
 import { createMemoryStore } from "@symbolon/store/testing";
 import { describe, expect, it } from "vitest";
 
@@ -6,8 +6,10 @@ import { createHandler } from "./create-handler";
 
 const CONFIG: Config = { issuer: "https://id.example.com", secret: "s".repeat(44), isDevMode: false };
 
-function handlerWith(store: Store = createMemoryStore()) {
-  return createHandler({ config: CONFIG, store });
+const SILENT = createLogger(() => {});
+
+function handlerWith(store: Store = createMemoryStore(), logger = SILENT) {
+  return createHandler({ config: CONFIG, store, logger });
 }
 
 describe("createHandler", () => {
@@ -35,6 +37,36 @@ describe("createHandler", () => {
     expect(await response.text()).not.toContain("closed");
   });
 
+  it("shouldStillAnswer500WhenTheLoggerThrows", async () => {
+    const store = createMemoryStore();
+    await store.close();
+    const throwing = {
+      error() {
+        throw new Error("logger down");
+      },
+    };
+
+    const response = await handlerWith(store, throwing)(new Request("https://id.example.com/healthz"));
+
+    expect(response.status).toBe(500);
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+  });
+
+  it("shouldLogAnUnexpectedErrorWithThePathButNotTheQuery", async () => {
+    const store = createMemoryStore();
+    await store.close();
+    const lines: string[] = [];
+
+    await handlerWith(
+      store,
+      createLogger((line) => lines.push(line)),
+    )(new Request("https://id.example.com/healthz?code=query-under-test"));
+
+    expect(lines).toHaveLength(1);
+    expect(JSON.parse(lines[0] ?? "")).toMatchObject({ event: "request_failed", method: "GET", path: "/healthz" });
+    expect(lines[0]).not.toContain("query-under-test");
+  });
+
   it.each(["/healthz", "/nope"])("shouldSendSecurityHeadersOn%s", async (path) => {
     const response = await handlerWith()(new Request(`https://id.example.com${path}`));
 
@@ -54,6 +86,7 @@ describe("createHandler", () => {
     const handler = createHandler({
       config: { ...CONFIG, issuer: "http://localhost:3000", isDevMode: true },
       store: createMemoryStore(),
+      logger: SILENT,
     });
 
     const response = await handler(new Request("http://localhost:3000/healthz"));

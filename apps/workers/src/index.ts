@@ -1,4 +1,4 @@
-import { loadConfig } from "@symbolon/core";
+import { createLogger, loadConfig } from "@symbolon/core";
 import { createHandler, type Handler } from "@symbolon/server";
 import { createD1Store, type D1DatabaseLike } from "@symbolon/store-d1";
 
@@ -14,11 +14,14 @@ export interface Env {
 // the migrations table.
 let ready: Promise<Handler> | undefined;
 
+// Workers Logs collects what the Worker writes to the console.
+const logger = createLogger((line) => console.error(line));
+
 async function init(env: Env): Promise<Handler> {
   const config = loadConfig(env);
   const store = createD1Store(env.DB);
   await store.migrate();
-  return createHandler({ config, store });
+  return createHandler({ config, store, logger });
 }
 
 export default {
@@ -31,7 +34,7 @@ export default {
       // Try again on the next request, after the operator fixes the configuration or the database.
       ready = undefined;
       // A ConfigError names variables, never values (invariant 2).
-      console.error(error instanceof Error ? error.message : "Symbolon failed to start");
+      logger.error("startup_failed", { error });
       return new Response(null, { status: 500 });
     }
     return handler(request);

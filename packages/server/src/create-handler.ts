@@ -1,4 +1,4 @@
-import type { Config, Store } from "@symbolon/core";
+import type { Config, Logger, Store } from "@symbolon/core";
 
 import { issuerUrl } from "./request-url";
 import { withSecurityHeaders } from "./security-headers";
@@ -9,6 +9,8 @@ export interface HandlerOptions {
   readonly config: Config;
   /** The migrated store. */
   readonly store: Store;
+  /** Where unexpected errors go. */
+  readonly logger: Logger;
 }
 
 /** A Fetch-API request handler, the shape every runtime adapter serves. */
@@ -43,9 +45,14 @@ export function createHandler(options: HandlerOptions): Handler {
     let response: Response;
     try {
       response = await route(request);
-    } catch {
-      // The error may hold a secret or a query (invariant 2), so it is not echoed. Logging it goes through
-      // the logging port once there is one.
+    } catch (error) {
+      // The error may hold a secret (invariant 2), so the client gets none of it. The log gets the path, not
+      // the query, which can carry codes and tokens.
+      try {
+        options.logger.error("request_failed", { method: request.method, path: new URL(request.url).pathname, error });
+      } catch {
+        // A failing logger must not cost the client its response, or the response its security headers.
+      }
       response = json({ error: "server_error" }, 500);
     }
     return withSecurityHeaders(response, isHttps);
