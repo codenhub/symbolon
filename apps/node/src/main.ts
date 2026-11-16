@@ -1,23 +1,20 @@
 import { ConfigError, loadConfig } from "@symbolon/core";
 import { createHandler } from "@symbolon/server";
 
+import { loadNodeConfig } from "./node-config";
 import { openStore } from "./open-store";
 import { serve } from "./serve";
 
-const DEFAULT_PORT = 3000;
-// Loopback unless told otherwise: a dev instance is not reachable from the network by accident. The Docker
-// image sets SYMBOLON_HOST=0.0.0.0.
-const DEFAULT_HOST = "127.0.0.1";
-
 async function main(): Promise<void> {
   const config = loadConfig(process.env);
-  const store = openStore(process.env["SYMBOLON_DATABASE"]);
+  const nodeConfig = loadNodeConfig(process.env);
+  const store = openStore(nodeConfig.database);
   await store.migrate();
 
   const { server, port } = await serve(createHandler({ config, store }), {
     origin: new URL(config.issuer).origin,
-    port: Number(process.env["SYMBOLON_PORT"] ?? DEFAULT_PORT),
-    host: process.env["SYMBOLON_HOST"] ?? DEFAULT_HOST,
+    port: nodeConfig.port,
+    host: nodeConfig.host,
   });
   console.log(`Symbolon is listening on port ${port} for ${config.issuer}${config.isDevMode ? " (dev mode)" : ""}`);
 
