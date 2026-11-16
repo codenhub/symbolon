@@ -1,6 +1,6 @@
 ---
 status: APPROVED
-last_updated: 2026-10-20
+last_updated: 2026-11-16
 scope: The security and design commitments every change to Symbolon keeps.
 ---
 
@@ -32,7 +32,7 @@ Enforced by: not yet.
 
 Validate all request input (forms, query strings, JSON, headers) with `@codenhub/validation` at the boundary. Every input has a bounded size.
 
-Enforced by: the environment is validated by `loadConfig`. Request input: not yet; there is no route that reads any.
+Enforced by: the environment is validated by `loadConfig`. Request bodies are read with a byte limit by `readBody` (`packages/server/src/read-body.test.ts`), and request URLs are rebuilt on the issuer's origin by `issuerUrl` (`packages/server/src/request-url.test.ts`, `apps/node/tests/integration/serve.test.ts`). Request validation: not yet; there is no route that reads any input.
 
 ## 5. Web hygiene on every HTML response
 

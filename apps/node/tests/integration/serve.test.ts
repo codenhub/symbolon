@@ -31,6 +31,25 @@ describe("serve", () => {
     expect(seen).toBe("https://id.example.com/healthz?a=1");
   });
 
+  it("shouldKeepADoubleSlashTargetOnTheConfiguredOrigin", async () => {
+    let seen = "";
+    const port = await start(async (request) => {
+      seen = request.url;
+      return new Response("ok");
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      httpRequest({ host: "127.0.0.1", port, path: "//evil.example/x" }, (response) => {
+        response.resume();
+        response.on("end", resolve);
+      })
+        .on("error", reject)
+        .end();
+    });
+
+    expect(new URL(seen).origin).toBe("https://id.example.com");
+  });
+
   it("shouldPassTheBodyAndReturnTheResponse", async () => {
     const port = await start(async (request) => new Response(await request.text(), { status: 201 }));
 

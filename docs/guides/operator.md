@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-10-20
+last_updated: 2026-11-16
 scope: Running Symbolon: configuration, Docker, Cloudflare Workers, and backups.
 ---
 
@@ -35,7 +35,9 @@ It will encrypt the data that must be recoverable, such as signing keys and TOTP
 
 ## Docker
 
-The image runs as a non-root user, keeps its data in the `/data` volume, and has a health check on `/healthz`. It speaks plain HTTP inside the container: put a TLS-terminating reverse proxy in front of it, and set `SYMBOLON_ISSUER` to the public `https://` URL.
+The image runs as a non-root user, keeps its data in the `/data` volume, and has a health check on `/healthz`. It speaks plain HTTP inside the container: put a TLS-terminating reverse proxy in front of it, and set `SYMBOLON_ISSUER` to the public `https://` URL. Symbolon builds every URL from the issuer, never from the `Host` header the proxy forwards.
+
+Over HTTPS, every response carries `Strict-Transport-Security: max-age=63072000` without `includeSubDomains`, since the subdomains of the issuer's host are yours to decide. Add `includeSubDomains`, or a site-wide `Cross-Origin-Opener-Policy`, at the proxy if they suit your domain.
 
 ```sh
 docker run -d --name symbolon -p 127.0.0.1:3000:3000 \
@@ -62,14 +64,14 @@ pnpm install
 pnpm --filter @symbolon/workers exec wrangler d1 create symbolon
 ```
 
-Put the database id it prints in `apps/workers/wrangler.jsonc`, along with your `SYMBOLON_ISSUER`, then set the secret and deploy:
+Put the database id it prints in `apps/workers/wrangler.jsonc`, along with your `SYMBOLON_ISSUER` and its host as the custom domain in `routes`, then set the secret and deploy:
 
 ```sh
 pnpm --filter @symbolon/workers exec wrangler secret put SYMBOLON_SECRET
 pnpm --filter @symbolon/workers run deploy
 ```
 
-The Worker migrates D1 on the first request each instance serves.
+The Worker migrates D1 on the first request each instance serves. It answers only on that custom domain: `workers_dev` and `preview_urls` are off, so no `*.workers.dev` name serves the same instance under another origin.
 
 ## Backups
 
