@@ -10,6 +10,11 @@
   "name": "symbolon",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
+  // Served only on the issuer's host. A `*.workers.dev` name or a preview URL would be a second origin
+  // answering as the same identity provider.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "id.example.com", "custom_domain": true }],
   "vars": {
     "SYMBOLON_ISSUER": "https://id.example.com",
   },
