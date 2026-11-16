@@ -5,11 +5,13 @@ const BASELINE_HEADERS: Readonly<Record<string, string>> = {
     "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
   "Referrer-Policy": "no-referrer",
   "X-Content-Type-Options": "nosniff",
-  "Cross-Origin-Opener-Policy": "same-origin",
   "Cross-Origin-Resource-Policy": "same-origin",
 };
 
-const HSTS = "max-age=63072000; includeSubDomains";
+// No `includeSubDomains`: it would bind every subdomain of the issuer's host to HTTPS, which is the
+// operator's decision, not Symbolon's. Nor is COOP in the baseline: it would break a sign-in
+// popup an app opens, and the pages that need it set it themselves. An operator can add either at the proxy.
+const HSTS = "max-age=63072000";
 
 /**
  * Returns a copy of a response with the security headers every Symbolon response carries.

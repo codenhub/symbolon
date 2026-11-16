@@ -41,7 +41,13 @@ describe("createHandler", () => {
     expect(response.headers.get("Content-Security-Policy")).toContain("frame-ancestors 'none'");
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(response.headers.get("Referrer-Policy")).toBe("no-referrer");
-    expect(response.headers.get("Strict-Transport-Security")).toContain("max-age=");
+    expect(response.headers.get("Strict-Transport-Security")).toBe("max-age=63072000");
+  });
+
+  it("shouldLeaveCrossOriginOpenerPolicyToThePagesThatNeedIt", async () => {
+    const response = await handlerWith()(new Request("https://id.example.com/healthz"));
+
+    expect(response.headers.has("Cross-Origin-Opener-Policy")).toBe(false);
   });
 
   it("shouldOmitHstsOnPlainHttp", async () => {
