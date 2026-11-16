@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.node.json",
   "compilerOptions": {
+    // The build script is JavaScript, so Node.js runs it as is; it is checked all the same.
+    "allowJs": true,
+    "checkJs": true,
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*", "tests/**/*", "scripts/**/*", "vitest.config.ts"]
