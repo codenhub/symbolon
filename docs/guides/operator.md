@@ -12,16 +12,16 @@ scope: Running Symbolon: configuration, Docker, Cloudflare Workers, and backups.
 
 Symbolon reads a few environment variables, the ones it needs before the database exists. Everything else will live in the database and be edited from the dashboard.
 
-| Variable            | Required | Meaning                                                                                                                                         |
-| ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SYMBOLON_ISSUER`   | yes      | The public URL of the instance, such as `https://id.example.com`. It is the OIDC issuer, so changing it later breaks every app's configuration. |
-| `SYMBOLON_SECRET`   | yes      | The master secret, at least 32 characters. See [the master secret](#the-master-secret).                                                         |
-| `SYMBOLON_DEV_MODE` | no       | `true` allows an `http://` issuer, for local development only. Default `false`.                                                                 |
-| `SYMBOLON_DATABASE` | no       | Node.js only. A SQLite file path, or a `postgres://` URL. Default `./data/symbolon.db`; the Docker image sets `/data/symbolon.db`.              |
-| `SYMBOLON_PORT`     | no       | Node.js only. Default `3000`.                                                                                                                   |
-| `SYMBOLON_HOST`     | no       | Node.js only. The interface to listen on. Default `127.0.0.1`; the Docker image sets `0.0.0.0`.                                                 |
+| Variable            | Required | Meaning                                                                                                                                                                                                                    |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SYMBOLON_ISSUER`   | yes      | The public URL of the instance, such as `https://id.example.com`. It is the OIDC issuer, so changing it later breaks every app's configuration. A trailing slash is dropped; a query, fragment or credentials are refused. |
+| `SYMBOLON_SECRET`   | yes      | The master secret, at least 32 characters. See [the master secret](#the-master-secret).                                                                                                                                    |
+| `SYMBOLON_DEV_MODE` | no       | `true` allows an `http://` issuer, for local development only. Default `false`.                                                                                                                                            |
+| `SYMBOLON_DATABASE` | no       | Node.js only. A SQLite file path, or a `postgres://` URL. Default `./data/symbolon.db`; the Docker image sets `/data/symbolon.db`.                                                                                         |
+| `SYMBOLON_PORT`     | no       | Node.js only. An integer from 1 to 65535. Default `3000`.                                                                                                                                                                  |
+| `SYMBOLON_HOST`     | no       | Node.js only. The interface to listen on, an IP address or a host name. Default `127.0.0.1`; the Docker image sets `0.0.0.0`.                                                                                              |
 
-Symbolon refuses to start with an `http://` issuer unless dev mode is on, and the error names the variable, never its value.
+Symbolon refuses to start with an `http://` issuer unless dev mode is on, or with any variable it cannot read, and the error names the variable, never its value.
 
 ### The master secret
 

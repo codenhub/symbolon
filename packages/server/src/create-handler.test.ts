@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { createHandler } from "./create-handler";
 
-const CONFIG: Config = { issuer: "https://id.example.com/", secret: "s".repeat(44), isDevMode: false };
+const CONFIG: Config = { issuer: "https://id.example.com", secret: "s".repeat(44), isDevMode: false };
 
 function handlerWith(store: Store = createMemoryStore()) {
   return createHandler({ config: CONFIG, store });
@@ -52,7 +52,7 @@ describe("createHandler", () => {
 
   it("shouldOmitHstsOnPlainHttp", async () => {
     const handler = createHandler({
-      config: { ...CONFIG, issuer: "http://localhost:3000/", isDevMode: true },
+      config: { ...CONFIG, issuer: "http://localhost:3000", isDevMode: true },
       store: createMemoryStore(),
     });
 
