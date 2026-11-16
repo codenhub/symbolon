@@ -4,6 +4,7 @@
   // these projects emit nothing. A new package adds its tsconfig here.
   "files": [],
   "references": [
+    { "path": "./tsconfig.root.json" },
     { "path": "./packages/core" },
     { "path": "./packages/server" },
     { "path": "./packages/store" },

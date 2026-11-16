@@ -7,24 +7,24 @@ packages:
 # hold two versions of one dependency by accident. A new third-party dependency adds its version here.
 catalog:
   "@codenhub/i18n": ^0.1.0
-  "@codenhub/icons": ^0.2.1
+  "@codenhub/icons": ^0.3.0
   "@codenhub/jwt": ^0.0.1
   "@codenhub/oidc": ^0.0.1
-  "@codenhub/styles": ^0.6.0
-  "@codenhub/validation": ^0.4.0
-  "@playwright/test": ^1.61.1
-  "@types/node": ^24.19.2
-  "@vitest/coverage-v8": ^5.0.5
+  "@codenhub/styles": ^0.9.0
+  "@codenhub/validation": ^0.6.0
+  "@playwright/test": ^1.65.1
+  "@types/node": ^26.6.6
+  "@vitest/coverage-v8": ^5.1.0
   esbuild: ^0.28.1
-  miniflare: ^5.20261012.1-beta
-  oxfmt: ^0.73.0
-  oxlint: ^1.72.0
+  miniflare: ^5.20261113.0-beta
+  oxfmt: ^0.78.0
+  oxlint: ^1.91.0
   postgres: ^3.4.9
-  prettier: ^3.6.0
+  prettier: ^3.10.1
   typescript: ^7.0.2
-  vite: ^8.1.3
-  vitest: ^5.0.5
-  wrangler: ^4.120.0
+  vite: ^8.3.8
+  vitest: ^5.1.0
+  wrangler: ^4.162.0
 
 # Supply-chain rules, applied to every install, local and in CI alike (docs/workspace.md, "Dependency installs").
 # Refuses a transitive dependency that resolves to a git repository or a tarball URL instead of the registry.
@@ -40,6 +40,6 @@ allowBuilds:
   workerd: true
 
 # Makes pnpm refuse an install outside `engines` in package.json instead of only printing a warning, so a
-# mismatch surfaces before it turns into a failure no one can reproduce (docs/workspace.md, "Toolchain"). It lives here because pnpm ignores
-# `engine-strict` in .npmrc: checked with pnpm 11.7.
+# mismatch surfaces before it turns into a failure no one can reproduce (docs/workspace.md, "Toolchain"). It
+# lives here because pnpm ignores `engine-strict` in .npmrc: checked with pnpm 11.7.
 engineStrict: true

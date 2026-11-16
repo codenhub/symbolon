@@ -14,7 +14,7 @@ const options = {
   outfile: "dist/main.js",
   bundle: true,
   platform: "node",
-  target: "node24",
+  target: "node26",
   format: "esm",
   sourcemap: true,
   // Some bundled CommonJS calls `require` for Node.js built-ins, which an ES module lacks.

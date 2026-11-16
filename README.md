@@ -10,7 +10,7 @@ There is no paid tier, no hosted edition and no telemetry: every feature is in t
 
 ## Runs on
 
-- **Docker / Node.js 24**, with SQLite on a volume by default, or PostgreSQL.
+- **Docker / Node.js 26**, with SQLite on a volume by default, or PostgreSQL.
 - **Cloudflare Workers**, with D1.
 
 One runtime-agnostic core serves both; see the [architecture](docs/architecture.md). Built on [`@codenhub/oidc`](https://github.com/codenhub/codenhub/tree/main/packages/oidc), [`@codenhub/jwt`](https://github.com/codenhub/codenhub/tree/main/packages/jwt) and the other codenhub packages.

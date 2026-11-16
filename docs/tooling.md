@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-11-12
+last_updated: 2026-11-16
 scope: Setup, how the root scripts are implemented, the TypeScript and Vitest configuration, narrowing a run, local development, and adding a package.
 ---
 
@@ -10,7 +10,7 @@ scope: Setup, how the root scripts are implemented, the TypeScript and Vitest co
 
 Every script runs from the repository root. There is no workspace CLI: the scripts call pnpm, Vitest, `tsc`, oxlint, oxfmt and Prettier directly, so each one is a command a contributor can read in `package.json` and run on its own. A workspace that outgrows plain scripts adds a CLI as a package of its own; until then a wrapper would be one more thing to learn and to keep in step. codenhub's `hub` is private to that repository.
 
-Markdown is formatted by Prettier with `proseWrap: "never"`, set in `.prettierrc.json`, and the files it leaves alone are listed in `.prettierignore`; [Workspace](workspace.md#two-formatters) says why Prettier, not oxfmt, owns Markdown.
+Markdown is formatted by Prettier with `proseWrap: "never"`, set in `.prettierrc.json5`, and the files it leaves alone are listed in `.prettierignore`; [Workspace](workspace.md#two-formatters) says why Prettier, not oxfmt, owns Markdown.
 
 ## Setup
 
@@ -19,7 +19,7 @@ nvm install
 pnpm install
 ```
 
-Setup needs pnpm on the `PATH`, installed apart from Node.js, with the standalone script in [pnpm's installation guide](https://pnpm.io/installation): a pnpm installed through `npm` belongs to the Node.js version it was installed under, and `nvm install` switching versions takes it off the `PATH`. Any such version switches itself to the one the `packageManager` field in `package.json` pins before it runs, unless its `manage-package-manager-versions` setting has been turned off; with it off, install the pinned version itself. Node.js does not bring pnpm with it: Node.js 24 ships Corepack switched off, and later versions do not ship it at all.
+Setup needs pnpm on the `PATH`, installed apart from Node.js, with the standalone script in [pnpm's installation guide](https://pnpm.io/installation): a pnpm installed through `npm` belongs to the Node.js version it was installed under, and `nvm install` switching versions takes it off the `PATH`. Any such version switches itself to the one the `packageManager` field in `package.json` pins before it runs, unless its `manage-package-manager-versions` setting has been turned off; with it off, install the pinned version itself. Node.js does not bring pnpm with it: Node.js 25 and later do not ship Corepack.
 
 `.nvmrc` pins Node.js. `nvm install` reads it, downloads that version when it is missing, and switches to it; with another version manager, install and use the version `.nvmrc` names. nvm for Windows does not read `.nvmrc`, and `nvm install` and `nvm use` without a version fail, so name it; in PowerShell, `nvm install (Get-Content .nvmrc)`, then `nvm use (Get-Content .nvmrc)`. Checked with nvm for Windows 1.2.2, and in the source of 2.0.1, whose `install` requires the version. [Workspace](workspace.md#toolchain) covers why the versions are pinned where they are.
 
@@ -34,7 +34,7 @@ Setup needs pnpm on the `PATH`, installed apart from Node.js, with the standalon
 | `pnpm format:fix`    | The same two formatters, rewriting files.                                                                                                  |
 | `pnpm lint:check`    | `oxlint --deny-warnings`: a warning fails it, like an error.                                                                               |
 | `pnpm lint:fix`      | `oxlint --fix`.                                                                                                                            |
-| `pnpm typecheck`     | `tsc -b` over the solution in `tsconfig.json`: every package, app and suite it references.                                                 |
+| `pnpm typecheck`     | `tsc -b` over the solution in `tsconfig.json`: the root config files and every package, app and suite it references.                       |
 | `pnpm test`          | `vitest run`: every package's and app's Vitest project, in one run. No browser.                                                            |
 | `pnpm test:watch`    | `vitest`, in watch mode.                                                                                                                   |
 | `pnpm test:coverage` | `vitest run --coverage`, with a V8 coverage report in `coverage/`.                                                                         |
@@ -52,6 +52,7 @@ Setup needs pnpm on the `PATH`, installed apart from Node.js, with the standalon
 | `tsconfig.base.json`             | The compiler settings every project shares: strict, `noUncheckedIndexedAccess`, `noUnusedLocals` and `noUnusedParameters`, `verbatimModuleSyntax`, `isolatedModules`, bundler resolution, and type-checking only (`noEmit`). |
 | `tsconfig.runtime-agnostic.json` | The base plus the `WebWorker` library and no types. It checks the source of `core`, `server`, `store`, `store-d1` and `apps/workers`, so a Node.js import or global fails `pnpm typecheck`.                                  |
 | `tsconfig.node.json`             | The base plus the DOM library and Node.js types, for the Node.js adapters, `apps/node`, and the tests of every package.                                                                                                      |
+| `tsconfig.root.json`             | The project for the root config files, such as `vitest.config.ts`. Node.js runs these directly, so it checks them by Node's rules: Node.js types, NodeNext resolution, and relative imports with the file's own extension.   |
 | `tsconfig.json`                  | The solution `tsc -b` builds. It lists projects and holds no files.                                                                                                                                                          |
 | `vitest.config.ts`               | The Vitest projects (`packages/*`, `apps/node`, `apps/workers`) and the V8 coverage settings. The dashboard and the browser suite are not Vitest projects.                                                                   |
 

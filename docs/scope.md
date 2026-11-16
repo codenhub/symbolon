@@ -1,6 +1,6 @@
 ---
 status: DRAFT
-last_updated: 2026-10-20
+last_updated: 2026-11-16
 scope: The product scope of Symbolon 0.1 and what comes after it.
 ---
 
@@ -57,7 +57,7 @@ symbolon/
 
 - **Core logic** only uses Fetch-API `Request`/`Response`, Web Crypto, and injected interfaces: store, mail, clock, rate limiter, key material. The same core runs on both targets.
 - **Two first-class targets for 0.1**:
-  - **Docker / Node 24+**: a single container image, SQLite by default (`node:sqlite`, no native dependency) on a mounted volume, Postgres optional.
+  - **Docker / Node 26+**: a single container image, SQLite by default (`node:sqlite`, no native dependency) on a mounted volume, Postgres optional.
   - **Cloudflare Workers**: D1 for storage. Use Durable Objects only where D1 can't give the needed atomicity or rate-limit semantics.
 - Other runtimes (Deno, Bun, other edge platforms) should be possible with a new adapter. They don't need to ship in 0.1.
 

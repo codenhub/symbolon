@@ -1,6 +1,6 @@
 ---
 status: IMPLEMENTED
-last_updated: 2026-10-20
+last_updated: 2026-11-16
 scope: Workspace layout, dependency direction, the runtime boundary, and the structural decisions behind them.
 ---
 
@@ -72,7 +72,7 @@ Request URLs are built on the configured issuer's origin, never on the `Host` he
 
 - **Migrations** are one ordered list in `@symbolon/store`, each written once per dialect (SQLite, which D1 shares, and PostgreSQL) as a list of single statements, because D1's `prepare` takes one statement. Each adapter applies pending migrations in `migrate()`, in a transaction (a batch per migration on D1), recording applied ids in `symbolon_migrations`. The Node.js app migrates on startup; the Worker migrates on the first request of each isolate, which costs one read once the schema is current. Rejected: wrangler's D1 migration files, which would be a second copy of the schema that can drift from the other dialects.
 - **PostgreSQL driver:** [`postgres`](https://github.com/porsager/postgres) rather than `pg`. It has no dependencies, is ESM, and bundles into `dist/main.js`; `pg` brings `pg-pool`, `pg-types` and others, and its optional native binding complicates bundling.
-- **SQLite** runs on `node:sqlite`, built into Node.js 24, so the image needs no native module. On Node.js 24.14.1 it prints an `ExperimentalWarning` at startup.
+- **SQLite** runs on `node:sqlite`, built into Node.js, so the image needs no native module.
 
 ## Dashboard
 

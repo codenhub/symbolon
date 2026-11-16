@@ -6,11 +6,13 @@
 #
 # docs/guides/operator.md covers running it; docs/ci.md covers how CI builds and publishes it.
 
-ARG NODE_VERSION=24.14.1
+ARG NODE_VERSION=26.13.1
 
 FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /repo
-RUN npm install --global pnpm@11.7.0
+# The pnpm version `packageManager` pins, read from package.json so it is declared once.
+COPY package.json ./
+RUN npm install --global "$(node -p 'require("./package.json").packageManager')"
 COPY . .
 # Only the Node.js server and what it depends on: no browsers, no workerd, no dashboard toolchain.
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
