@@ -37,6 +37,21 @@ describe("createHandler", () => {
     expect(await response.text()).not.toContain("closed");
   });
 
+  it("shouldStillAnswer500WhenTheLoggerThrows", async () => {
+    const store = createMemoryStore();
+    await store.close();
+    const throwing = {
+      error() {
+        throw new Error("logger down");
+      },
+    };
+
+    const response = await handlerWith(store, throwing)(new Request("https://id.example.com/healthz"));
+
+    expect(response.status).toBe(500);
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+  });
+
   it("shouldLogAnUnexpectedErrorWithThePathButNotTheQuery", async () => {
     const store = createMemoryStore();
     await store.close();

@@ -46,7 +46,11 @@ export function createHandler(options: HandlerOptions): Handler {
     } catch (error) {
       // The error may hold a secret (invariant 2), so the client gets none of it. The log gets the path, not
       // the query, which can carry codes and tokens.
-      options.logger.error("request_failed", { method: request.method, path: new URL(request.url).pathname, error });
+      try {
+        options.logger.error("request_failed", { method: request.method, path: new URL(request.url).pathname, error });
+      } catch {
+        // A failing logger must not cost the client its response, or the response its security headers.
+      }
       response = json({ error: "server_error" }, 500);
     }
     return withSecurityHeaders(response, isHttps);
